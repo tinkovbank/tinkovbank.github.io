@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Радиоплитка</title>
+    <style>
+	      body {
+              background: linear-gradient(135deg, #0f172a 0%, #fda085 50%);
+              min-height: 100vh; /* Чтобы градиент растянулся на весь экран, даже если на сайте мало текста */
+          }
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #0f0f14;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 0 0 5px 0;
+            color: #a855f7;
+        }
+
+        p {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Сетка для радиостанций */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 120px; /* Отступ снизу, чтобы плеер не перекрывал плитки */
+        }
+
+        /* Стиль отдельного блока (станции) */
+        .card {
+            background: #1e1e29;
+            border: 2px solid #2e2e3f;
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+            user-select: none;
+        }
+
+        /* Эффект при наведении */
+        .card:hover {
+            border-color: #a855f7;
+            transform: translateY(-2px);
+            background: #252538;
+        }
+
+        /* Стиль активной (играющей) станции */
+        .card.active {
+            background: #a855f7;
+            border-color: #c084fc;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Фиксированная панель плеера внизу экрана */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a24;
+            border-top: 1px solid #2e2e3f;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5);
+        }
+
+        .now-playing {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .now-playing span {
+            color: #a855f7;
+        }
+
+        audio {
+            width: 100%;
+            max-width: 500px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📻 Все радиостанции</h1>
+
+</div>
+<div style="max-width: 250px; width: 100%; margin: 10px auto; text-align: center; padding: 8px 0; background: #f3f4f6; border-radius: 4px;">
+    <a href="/reklama" style="color: #000000; font-weight: 600; text-decoration: none;">Рекомендуем</a>
+</div>
+
+<div class="grid" id="stationsGrid"></div>
+<div class="player-bar">
+    <div class="now-playing">Сейчас играет: <span id="currentTitle">Ничего не выбрано</span></div>
+    <audio id="audioPlayer" controls></audio>
+</div>
+
+<script>
+    const stations = [
+        { name: "1. DFM", url: "https://dfm.hostingradio.ru/dfm32.aacp" },
+        { name: "2. Дорожное радио", url: "https://dorognoe.hostingradio.ru/dorognoe32.aacp" },
+        { name: "3. Серебряный Дождь", url: "https://silverrain.hostingradio.ru/silver32.aacp" },
+        { name: "4. Родники Радио", url: "https://rodniki.hostingradio.ru/rodniki32.aacp" },
+        { name: "5. Радио Lo-Fi", url: "https://reg.fmplay.ru:8000/lofiradio-32.aac" },
+        { name: "6. Афродита FM", url: "https://reg.fmplay.ru:8000/afrodita_radio-32.aac" },
+        { name: "7. HipHop Radio FM", url: "https://reg.fmplay.ru:8000/hiphopradio-32.aac" },
+        { name: "8. Capital", url: "https://fed.fmplay.ru:8000/capital-32.aac" },
+        { name: "9. Best-Radio", url: "https://fed.fmplay.ru:8000/best-32.aac" },
+        { name: "10. Comedy Radio", url: "https://gpm.hostingradio.ru/comedyradio32.aacp" },
+        { name: "11. JAZZ 89.1", url: "https://nashe1.hostingradio.ru/jazz32.aacp" },
+        { name: "12. Love", url: "https://fed.fmplay.ru:8000/love-32.aac" },
+        { name: "13. RockFM 95.5", url: "https://nashe1.hostingradio.ru/rock32.aacp" },
+        { name: "14. Наше Радио", url: "https://nashe1.hostingradio.ru/nashe32.aacp" },
+        { name: "15. Like FM", url: "https://gpm.hostingradio.ru/likefm32.aacp" },
+        { name: "16. Радио Максимум", url: "https://maximum.hostingradio.ru/maximum32.aacp" },
+        { name: "17. Радио Монтекарло", url: "https://fed.fmplay.ru:8000/mcarlospb-32.aac" },
+        { name: "18. Радио Энерджи", url: "https://gpm.hostingradio.ru/energyfm32.aacp" },
+        { name: "19. Relax-Fm", url: "https://gpm.hostingradio.ru/relaxfm32.aacp" },
+        { name: "20. АвтоРадио", url: "https://gpm.hostingradio.ru/avtoradio32.aacp" },
+        { name: "21. Восток-FM", url: "https://fed.fmplay.ru:8000/vostok-32.aac" },
+        { name: "22. Busines-FM", url: "https://bfm.hostingradio.ru:8004/bfm32.aacp" },
+        { name: "23. Вести-FM", url: "https://fed.fmplay.ru:8000/vesti-32.aac" },
+        { name: "24. Говорит Москва", url: "https://fed.fmplay.ru:8000/gmoskva-32.aac" },
+        { name: "25. Детское Радио", url: "https://gpm.hostingradio.ru/detifm32.aacp" },
+        { name: "26. Европа Плюс", url: "https://epdop.hostingradio.ru:8033/europaplus32.aacp" },
+        { name: "27. Кекс-FM", url: "https://fed.fmplay.ru:8000/keks-32.aac" },
+        { name: "28. Комерсант-FM", url: "https://fed.fmplay.ru:8000/kommersant-32.aac" },
+        { name: "29. Комсомольская Правда", url: "https://kpradio.hostingradio.ru:8000/radiokp32.aacp" },
+        { name: "30. Радио Метро", url: "https://reg.fmplay.ru:8000/radiometro-32.aac" },
+        { name: "31. Милицейская Волна", url: "https://fed.fmplay.ru:8000/mvolna-32.aac" },
+        { name: "32. Москва-FM 90.2", url: "https://fed.fmplay.ru:8000/moscow-32.aac" },
+        { name: "33. Новое радио", url: "https://stream.newradio.ru/novoe32.aacp" },
+        { name: "34. Орфей-FM", url: "https://orfeyfm.hostingradio.ru:8034/orfeyfm32.aacp" },
+        { name: "35. Питер-FM", url: "https://fed.fmplay.ru:8000/piter-32.aac" },
+        { name: "36. Радио-7", url: "https://radio7.hostingradio.ru:8040/radio732.aacp" },
+        { name: "37. Радио РБК", url: "https://rbcreg.hostingradio.ru/rbc32.aacp" },
+        { name: "38. Популярная Класика-FM", url: "https://fed.fmplay.ru:8000/classic-32.aac" },
+        { name: "39. Record Dance Radio", url: "https://radiorecord.hostingradio.ru/rr_main32.aacp" },
+        { name: "40. Medved Dance Radio", url: "https://reg.fmplay.ru:8000/medved-32.aac" },
+        { name: "41. Ultra-FM", url: "https://fed.fmplay.ru:8000/ultra-32.aac" },
+        { name: "42. Радио Ваня", url: "https://fed.fmplay.ru:8000/vanya-32.aac" },
+		{ name: "43. Радио Вера", url: "https://radiovera.hostingradio.ru:8007/radiovera32.aacp" },
+		{ name: "44. Радио Дача", url: "https://fed.fmplay.ru:8000/dacha-32.aac" },
+		{ name: "45. Радио для Двоих", url: "https://fed.fmplay.ru:8000/rdd-32.aac" },
+		{ name: "46. Радио Звезда", url: "https://fed.fmplay.ru:8000/zvezda-32.aac" },
+		{ name: "47. Радио Искатель", url: "https://iskatel.hostingradio.ru:8015/iskatel32.aacp" },
+		{ name: "48. Радио Книга", url: "https://fed.fmplay.ru:8000/kniga-32.aac" },
+		{ name: "49. Радио Культура", url: "https://fed.fmplay.ru:8000/kultura-32.aac" },
+		{ name: "50. Радио Мир", url: "https://fed.fmplay.ru:8000/mir-32.aac" },
+		{ name: "51. Радио Маяк", url: "https://fed.fmplay.ru:8000/mayak-32.aac" },
+		{ name: "52. Монте Карло", url: "https://montecarlo.hostingradio.ru/montecarlo32.aacp" },
+		{ name: "53. Радио Родных дорог", url: "https://fed.fmplay.ru:8000/rrd-32.aac" },
+		{ name: "54. Радио России", url: "https://fed.fmplay.ru:8000/rrossii-32.aac" },
+		{ name: "55. Радио Шансон", url: "https://chanson.hostingradio.ru:8041/chanson32.aacp" },
+		{ name: "56. Шоколад", url: "https://choco.hostingradio.ru:10010/choco32.aacp" },
+		{ name: "57. Ретро ФМ", url: "https://retro.hostingradio.ru:8043/retro32.aacp" },
+		{ name: "58. Радио Романтика", url: "https://gpm.hostingradio.ru/romantika32.aacp" },
+		{ name: "59. Радио Русский Хит", url: "https://fed.fmplay.ru:8000/ruhit-32.aac" },
+		{ name: "60. Русское Радио", url: "https://rusradio.hostingradio.ru/rusradio32.aacp" },
+		{ name: "61. Studio-21", url: "https://stream.studio21.ru/studio2132.aacp" },
+		{ name: "62. Страна FM", url: "https://fed.fmplay.ru:8000/strana-32.aac" },
+		{ name: "63. Такси FM", url: "https://fed.fmplay.ru:8000/taxi-32.aac" },
+		{ name: "64. Хит FM", url: "https://hitfm.hostingradio.ru/hitfm32.aacp" },
+		{ name: "65. Эльдо радио", url: "https://emgspb.hostingradio.ru/eldoradio32.aacp" },
+		{ name: "66. Юмор FM", url: "https://gpm.hostingradio.ru/humorfm32.aacp" },
+		{ name: "67. Радио 1", url: "https://fed.fmplay.ru:8000/rtvp-32.aac" },
+		{ name: "68. Радио Эрмитаж", url: "https://fed.fmplay.ru:8000/hermitage-32.aac" },
+		{ name: "69. Жара FM", url: "https://zharafm.hostingradio.ru/zharafm32.aacp" },
+		{ name: "70. Твоя Волна", url: "https://fed.fmplay.ru:8000/tvoyavolna-32.aac" },
+		{ name: "71. Радио Зенит", url: "https://radiozenit.hostingradio.ru/radiozenit32.aacp" },
+		{ name: "72. Нестандарт Радио", url: "https://fed.fmplay.ru:8000/nestandart-32.aac" },
+		{ name: "73. Закрытый космос", url: "https://fed.fmplay.ru:8000/closedospace-32.aac" },
+		{ name: "74. Наше радио 2.0", url: "https://fed.fmplay.ru:8000/nashe2-32.aac" },
+		{ name: "75. Fon Music", url: "https://fed.fmplay.ru:8000/tntradio-32.aac" },
+		{ name: "76. Sputnik", url: "https://fed.fmplay.ru:8000/sputnik-32.aac" },
+		{ name: "77. Радио Юность", url: "https://fed.fmplay.ru:8000/unost-32.aac" },
+		{ name: "78. Союз FM", url: "https://fed.fmplay.ru:8000/soyuzfm-32.aac" },
+		{ name: "79. Radio Buu", url: "https://fed.fmplay.ru:8000/radiobuu-32.aac" },
+		{ name: "80. 4DUK", url: "https://fed.fmplay.ru:8000/4duk-32.aac" },
+		{ name: "81. Радио Москвы", url: "https://fed.fmplay.ru:8000/radiomockvy-32.aac" },
+		{ name: "82. SoundPark Deep", url: "https://fed.fmplay.ru:8000/spdeep-32.aac" },
+		{ name: "83. Insomnia radio", url: "https://fed.fmplay.ru:8000/insomniaradio-32.aac" },
+		{ name: "84. Радио Ангелов", url: "https://fed.fmplay.ru:8000/angelsradio-32.aac" },
+		{ name: "85. Маруся FM", url: "https://fed.fmplay.ru:8000/marusya-32.aac" },
+		{ name: "86. Радио День", url: "https://fed.fmplay.ru:8000/radioday-32.aac" },
+		{ name: "87. Kamon FM", url: "https://fed.fmplay.ru:8000/kamonfm-32.aac" },
+		{ name: "88. Portrock FM", url: "https://fed.fmplay.ru:8000/portrock-32.aac" },
+		{ name: "89. Мелодия FM", url: "https://fed.fmplay.ru:8000/melodia-32.aac" },
+		{ name: "90. Радонеж Радио", url: "https://fed.fmplay.ru:8000/radonezh-32.aac" },
+		{ name: "91. Калина Красная", url: "https://stream.kalina.fm/kalina32.aacp" },
+		{ name: "92. Мульт FM", url: "https://fed.fmplay.ru:8000/multfm-32.aac" },
+		{ name: "93. Радио Штаны", url: "https://fed.fmplay.ru:8000/radioshtani-32.aac" },
+		{ name: "94. Радио Гордость", url: "https://fed.fmplay.ru:8000/rgordost-32.aac" },
+		{ name: "95. Старый Портфель", url: "https://fed.fmplay.ru:8000/oldbrief-32.aac" },
+		{ name: "96. Динамит FM", url: "https://fed.fmplay.ru:8000/dinamit-32.aac" },
+		{ name: "97. Bigtunes-bass", url: "https://fed.fmplay.ru:8000/bigtunes-bass-32.aac" },
+		{ name: "98. Bigtunes-house", url: "https://reg.fmplay.ru:8000/bigtunes-house-32.aac" },
+		{ name: "99. Bigtunes-oldschool", url: "https://fed.fmplay.ru:8000/bigtunes-oldschool-32.aac" },
+		{ name: "100. Свое FM", url: "https://fed.fmplay.ru:8000/svoefm-32.aac" },
+		{ name: "101. Казак FM", url: "https://radio.kazak.fm/kazak32.aacp" },
+		{ name: "102. Ашкадар", url: "https://reg.fmplay.ru:8000/ashkadar-32.aac" },
+		{ name: "103. Аств радио", url: "https://reg.fmplay.ru:8000/astv-32.aac" },
+		{ name: "104. Борнео FM", url: "https://reg.fmplay.ru:8000/borneo-32.aac" },
+		{ name: "105. Красноярск FM", url: "https://streamer01.1028.fm:8443/krasnoyarsk32.aacp" },
+		{ name: "106. Макс FM", url: "https://maksfm.hostingradio.ru/maksfm32.aacp" },
+		{ name: "107. Ника FM", url: "https://reg.fmplay.ru:8000/nikafm-32.aac" },
+		{ name: "108. Первое радио", url: "https://reg.fmplay.ru:8000/pervoe-32.aac" },
+		{ name: "109. Радио Петербург", url: "https://reg.fmplay.ru:8000/peterburg-32.aac" },
+		{ name: "110. ПИ FM", url: "https://reg.fmplay.ru:8000/pifm-32.aac" },
+		{ name: "111. Приморская волна", url: "https://reg.fmplay.ru:8000/primvolna-32.aac" },
+		{ name: "112. Пульс FM", url: "https://reg.fmplay.ru:8000/puls-32.aac" },
+		{ name: "113. Радио 107", url: "https://reg.fmplay.ru:8000/radio107-32.aac" },
+		{ name: "114. Рандеву радио", url: "https://reg.fmplay.ru:8000/randevu-32.aac" },
+		{ name: "115. Татар радио", url: "https://reg.fmplay.ru:8000/tatar-32.aac" },
+		{ name: "116. Юнитон", url: "https://reg.fmplay.ru:8000/uniton-32.aac" },
+		{ name: "117. Адам FM", url: "https://radioadam.hostingradio.ru/radioadam32.aacp" },
+		{ name: "118. Радио 3", url: "https://reg.fmplay.ru:8000/radio3-32.aac" },
+		{ name: "119. Спутник Уфа", url: "https://reg.fmplay.ru:8000/sputnikufa-32.aac" },
+		{ name: "120. Апекс Радио", url: "https://reg.fmplay.ru:8000/apex-32.aac" },
+		{ name: "121. Югра FM", url: "https://reg.fmplay.ru:8000/ugra-32.aac" },
+		{ name: "122. Радио Сибирь", url: "https://reg.fmplay.ru:8000/sibir-32.aac" },
+		{ name: "123. Мария FM", url: "https://reg.fmplay.ru:8000/maria-32.aac" },
+		{ name: "124. Красная Армия", url: "https://reg.fmplay.ru:8000/redarmy-32.aac" },
+		{ name: "125. Nstation", url: "https://reg.fmplay.ru:8000/nstation-32.aac" },
+		{ name: "126. Радиола FM", url: "https://reg.fmplay.ru:8000/radiolaekt-32.aac" },
+		{ name: "127. Радио 54", url: "https://reg.fmplay.ru:8000/radio54-32.aac" },
+		{ name: "128. Радио СИ", url: "https://reg.fmplay.ru:8000/radioc-32.aac" },
+		{ name: "129. Мир Белогорья", url: "https://reg.fmplay.ru:8000/mirbelogorya-32.aac" },
+		{ name: "130. Heart fm", url: "https://reg.fmplay.ru:8000/heartfm-32.aac" },
+		{ name: "131. Балтик Плюс", url: "https://reg.fmplay.ru:8000/balticplus-32.aac" },
+		{ name: "132. Липецк FM", url: "https://reg.fmplay.ru:8000/lipetskfm-32.aac" },
+		{ name: "133. Пилот Радио", url: "https://reg.fmplay.ru:8000/pilot-32.aac" },
+		{ name: "134. Mcm радио", url: "https://reg.fmplay.ru:8000/mcm-32.aac" },
+		{ name: "135. Радио Р-29", url: "https://reg.fmplay.ru:8000/r29-32.aac" },
+		{ name: "136. Самара-450", url: "https://reg.fmplay.ru:8000/gubernia-32.aac" },
+		{ name: "137. 2*2 Радио", url: "https://reg.fmplay.ru:8000/radio2x2-32.aac" },
+		{ name: "138. Радио Весна", url: "https://reg.fmplay.ru:8000/vesnasm-32.aac" },
+		{ name: "139. Таван Радио", url: "https://reg.fmplay.ru:8000/tavan-32.aac" },
+		{ name: "140. Юлдаш", url: "https://reg.fmplay.ru:8000/uldash-32.aac" },
+		{ name: "141. Бим Радио", url: "https://bimradio.hostingradio.ru/bimradio32.aacp" },
+		{ name: "142. Говорит Майкоп", url: "https://voicemaikop.hostingradio.ru:8003/voicemaikop32.aacp" },
+		{ name: "143. Краснодар FM", url: "https://reg.fmplay.ru:8000/radiokrasnodar-32.aac" },
+		{ name: "144. Радио Хит", url: "https://reg.fmplay.ru:8000/radiohit-32.aac" },
+		{ name: "145. Железо FM", url: "https://reg.fmplay.ru:8000/zhelezofm-32.aac" },
+		{ name: "146. Пурга Радио", url: "https://reg.fmplay.ru:8000/radiopurga-32.aac" },
+		{ name: "147. Топ Радио", url: "https://reg.fmplay.ru:8000/topradio-32.aac" },
+		{ name: "148. Радио Русь", url: "https://reg.fmplay.ru:8000/radiorus-32.aac" },
+		{ name: "149. Power Hit", url: "https://reg.fmplay.ru:8000/powerhit-32.aac" },
+		{ name: "150. Радио Пилот", url: "https://reg.fmplay.ru:8000/pilotekb-32.aac" },
+		{ name: "151. Континенталь FM", url: "https://reg.fmplay.ru:8000/radiocon-32.aac" },
+		{ name: "152. Первое Светлое", url: "https://reg.fmplay.ru:8000/pervoesetevoe-32.aac" },
+		{ name: "153. Владивосток FM", url: "https://reg.fmplay.ru:8000/vladivostokfm-32.aac" },
+		{ name: "154. Рок Арсенал", url: "https://reg.fmplay.ru:8000/rockarsenalekb-32.aac" },
+		{ name: "155. Семерка FM", url: "https://reg.fmplay.ru:8000/7tumen-32.aac" },
+		{ name: "156. Radiona FM", url: "https://reg.fmplay.ru:8000/radiona-32.aac" },
+		{ name: "157. Радио Премиум", url: "https://reg.fmplay.ru:8000/rpfm-32.aac" },
+		{ name: "158. Импульс FM", url: "https://reg.fmplay.ru:8000/impulsfm-32.aac" },
+		{ name: "159. Stoty FM", url: "https://reg.fmplay.ru:8000/storyfm-32.aac" },
+		{ name: "160. Волгоград FM", url: "https://reg.fmplay.ru:8000/volgogradfm-32.aac" },
+		{ name: "161. Радио Сигма", url: "https://reg.fmplay.ru:8000/sigma-32.aac" },
+		{ name: "162. Умное Радио", url: "https://reg.fmplay.ru:8000/umnoeradio-32.aac" },
+		{ name: "163. Ямал-1 FM", url: "https://reg.fmplay.ru:8000/yamalone-32.aac" },
+		{ name: "164. Ноябрьск FM", url: "https://reg.fmplay.ru:8000/radionoyabrsk-32.aac" },
+		{ name: "165. Радио Прибой", url: "https://reg.fmplay.ru:8000/radiopriboy-32.aac" },
+		{ name: "166. Тетим FM", url: "https://reg.fmplay.ru:8000/tetimsaha-32.aac" },
+		{ name: "167. Радио-32", url: "https://reg.fmplay.ru:8000/32radio-32.aac" },
+		{ name: "168. Восток России", url: "https://reg.fmplay.ru:8000/vostoknews-32.aac" },
+		{ name: "169. Фантази Радио", url: "https://reg.fmplay.ru:8000/fantasyradio-32.aac" },
+		{ name: "170. MusiQ", url: "https://reg.fmplay.ru:8000/musiq-32.aac" },
+		{ name: "171. Модель для сборки", url: "https://reg.fmplay.ru:8000/mds-32.aac" },
+		{ name: "172. Радио Воскресенье", url: "https://reg.fmplay.ru:8000/voskresenie-32.aac" },
+		{ name: "173. Русская Волна", url: "https://reg.fmplay.ru:8000/ruwave-32.aac" },
+		{ name: "174. Фитнес Радио", url: "https://reg.fmplay.ru:8000/fitnessradio-32.aac" },
+		{ name: "175. Радио Таврия", url: "https://tavria.hostingradio.ru/tavria32.aacp" },
+
+    ];
+
+    const grid = document.getElementById('stationsGrid');
+    const player = document.getElementById('audioPlayer');
+    const currentTitle = document.getElementById('currentTitle');
+
+    // Генерация плиток на экране
+    stations.forEach((station, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerText = station.name;
+        card.dataset.url = station.url;
+        
+        card.addEventListener('click', function() {
+            // Убираем подсветку с предыдущей плитки
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            
+            // Подсвечиваем текущую плитку
+            card.classList.add('active');
+            
+            // Обновляем текст и запускаем поток
+            currentTitle.innerText = station.name;
+            player.src = station.url;
+            player.load();
+            player.play().catch(err => console.log("Автозапуск перехвачен политикой браузера"));
+        });
+
+        grid.appendChild(card);
+    });
+</script>
+
+</body>
+</html>
