@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница с рекламой</title>
 
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
+    <!-- Yandex.RTB: Подключаем один раз в head -->
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru" async></script>
 </head>
-
 <body>
 
+    <!-- Основной контент страницы (добавьте сюда ваш код) -->
 
-
-<!-- Yandex.RTB R-A-19461198-2 -->
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19461198-2",
-        "type": "fullscreen",
-        "platform": "touch"
+    <!-- Yandex.RTB R-A-19461198-2: Вызов блока перенесен в самый низ body -->
+    <script>
+    window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+            "blockId": "R-A-19461198-2",
+            "type": "fullscreen",
+            "platform": "touch"
+        })
     })
-})
-</script>
-
+    </script>
 </body>
 </html>
