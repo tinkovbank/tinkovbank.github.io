@@ -24,32 +24,22 @@
                 return;
             }
 
- window.yaContextCb.push(() => {
-    // 3. Уничтожаем старый баннер
-    if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
-        window.Ya.Context.AdvManager.destroy({
-            blockId: BLOCK_ID,
-            renderTo: `yandex_rtb_${BLOCK_ID}`
-        });
-    }
+            window.yaContextCb.push(() => {
+                // 3. Уничтожаем старый баннер перед вызовом нового (важно для очистки памяти!)
+                if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
+                    window.Ya.Context.AdvManager.destroy({
+                        blockId: BLOCK_ID,
+                        renderTo: `yandex_rtb_${BLOCK_ID}`
+                    });
+                }
 
-    // 4. Запрашиваем новый баннер
-    window.Ya.Context.AdvManager.render({
-        blockId: BLOCK_ID,
-        renderTo: `yandex_rtb_${BLOCK_ID}`,
-        async: true
-    });
-
-    // 5. Вручную отправляем хит в Яндекс Метрику
-    if (typeof ym === 'function') {
-        // Замените 12345678 на реальный номер вашего счетчика Метрики
-        ym(12345678, 'hit', window.location.href, {
-            title: document.title,
-            referer: document.referrer
-        });
-    }
-});
-
+                // 4. Запрашиваем новый баннер в тот же контейнер
+                window.Ya.Context.AdvManager.render({
+                    blockId: BLOCK_ID,
+                    renderTo: `yandex_rtb_${BLOCK_ID}`,
+                    async: true
+                });
+            });
             
             console.log(`[РСЯ] Запрос на обновление отправлен в ${new Date().toLocaleTimeString()}`);
         }
