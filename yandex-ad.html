@@ -38,21 +38,24 @@
             const iframeHtml = `
                 <!DOCTYPE html>
                 <html>
-				<head>
-                <script>window.yaContextCb=window.yaContextCb||[]</script>
-                <script src="https://yandex.ru/ads/system/context.js" async></script>
+                <head>
+				    <script>window.yaContextCb=window.yaContextCb||[]</script>
+				    <script src="https://yandex.ru/ads/system/context.js" async></script>
+                    <meta charset="UTF-8">
+                    <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
                 </head>
                 <body>
-                    <!-- Yandex.RTB R-A-19461198-1 -->
-                <div id="yandex_rtb_R-A-19461198-1"></div>
-                <script>
-                window.yaContextCb.push(() => {
-                Ya.Context.AdvManager.render({
-                "blockId": "R-A-19461198-1",
-                "renderTo": "yandex_rtb_R-A-19461198-1"
-    })
-})
-</script>
+                    <div id="yandex_rtb_${BLOCK_ID}"></div>
+                    <script>
+                        window.yaContextCB = window.yaContextCB || [];
+                        window.yaContextCB.push(() => {
+                            Ya.Context.AdvManager.render({
+                                blockId: '${BLOCK_ID}',
+                                renderTo: 'yandex_rtb_${BLOCK_ID}',
+                                async: true
+                            });
+                        });
+                    </script>
                 </body>
                 </html>
             `;
