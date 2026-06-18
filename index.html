@@ -1,24 +1,123 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Радиоплитка</title>
-    
+    <title>Телерадио Портал</title>
+    <style>
+        /* Современный градиентный фон */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Глубокий темно-синий градиент */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Контейнер с эффектом матового стекла (Glassmorphism) */
+        .portal-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 360px; /* Оптимально для мобильных */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        /* Заголовок внутри карточки */
+        .portal-title {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Сетка для кнопок */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+        }
+
+        /* Ссылки-обертки */
+        .button-container a {
+            text-decoration: none;
+            width: 100%;
+        }
+
+        /* Стильные мобильные кнопки */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08); /* Полупрозрачные стильные кнопки */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        /* Эффект при нажатии на обычные кнопки */
+        .btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
+        }
+
+        /* Яркий акцент для кнопки скачивания */
+        .btn-download {
+            background: #0071e3; /* Фирменный синий цвет Apple/Google */
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+        }
+        
+        .btn-download:active {
+            background: #005bb5;
+        }
+
+        /* Адаптация для планшетов и ПК */
+        @media (min-width: 600px) {
+            .portal-card {
+                max-width: 500px;
+                padding: 40px;
+            }
+            .button-container {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .btn {
+                font-size: 15px;
+                padding: 12px 24px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div style="display: flex; gap: 30px; max-width: 100%; justify-content: center;">
-  <a href="/tv.html"><button>Телевидение</button></a>
-  <a href="/radio.html"><button>Радио</button></a>
-  <a href="/rustore.html"><button>Скачать Приложение</button></a>
+<div class="portal-card">
+    <h1 class="portal-title">Телерадио Портал</h1>
+    
+    <div class="button-container">
+        <a href="/tv.html"><button class="btn">Телевидение</button></a>
+        <a href="/radio.html"><button class="btn">Радио</button></a>
+        <a href="/rustore.html"><button class="btn btn-download">Скачать</button></a>
+    </div>
 </div>
-
 
 </body>
 </html>
