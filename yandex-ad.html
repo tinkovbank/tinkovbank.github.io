@@ -14,7 +14,7 @@
     <script>
         // ДЛЯ ТЕСТА: 5000 (5 секунд). 
         // ДЛЯ РАБОЧЕГО САЙТА: поставьте 30000 (30 секунд), чтобы Яндекс не заблокировал аккаунт за накрутку!
-        const INTERVAL = 15000; 
+        const INTERVAL = 30000; 
         
         // ВСТАВЛЯЕМ ВАШ ЛИЧНЫЙ ID БЛОКА
         const BLOCK_ID = 'R-A-19461198-1'; 
@@ -41,11 +41,12 @@
                 <head>
                     <meta charset="UTF-8">
                     <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
-					<div id="yandex_rtb_${BLOCK_ID}"></div>
+					<script>window.yaContextCb=window.yaContextCb||[]</script>
                     <script src="https://yandex.ru/ads/system/context.js" async><\/script>
                 </head>
                 <body>
                     <script>
+					    <div id="yandex_rtb_${BLOCK_ID}"></div>
                         window.yaContextCB = window.yaContextCB || [];
                         window.yaContextCB.push(() => {
                             Ya.Context.AdvManager.render({
