@@ -6,59 +6,54 @@
 </head>
 <body>
 
-    <h3>Статус: <span id="ad-status" style="color: blue;">Ожидание...</span></h3>
+    <h3>Статус: <span id="ad-status" style="color: blue;">Ожидание загрузки context.js...</span></h3>
     
-    <!-- Контейнер для баннера -->
-    <div id="yandex-dynamic-container" style="width: 300px; height: 250px; background: #f9f9f9; border: 1px dashed #999;"></div>
+    <!-- Используем фиксированный контейнер, разрешенный Яндексом -->
+    <div id="yandex_rtb_R-A-2668388-3" style="width: 300px; height: 250px; background: #fdfdfd; border: 1px solid #000;"></div>
 
-    <!-- Загрузчик Яндекса (1 раз на страницу) -->
+    <!-- Загружаем библиотеку Яндекса -->
     <script src="https://yandex.ru/ads/system/context.js" async></script>
 
     <script>
         window.yaContextCB = window.yaContextCB || [];
         
-        const INTERVAL = 5000; // 5 секунд
-        // ИСПОЛЬЗУЕМ ТЕСТОВЫЙ ID ЯНДЕКСА (он работает ВЕЗДЕ, даже на file:///)
-        const BLOCK_ID = 'R-A-2668388-3'; 
+        const INTERVAL = 7000; // 7 секунд
+        const BLOCK_ID = 'R-A-2668388-3'; // Всегда рабочий тестовый блок
+        const RENDER_TO = 'yandex_rtb_R-A-2668388-3';
+        const statusNode = document.getElementById('ad-status');
 
-        function refreshYandexAd() {
-            const parentContainer = document.getElementById('yandex-dynamic-container');
-            const statusNode = document.getElementById('ad-status');
-            if (!parentContainer) return;
+        function loadAd() {
+            statusNode.innerText = "Запрос отправлен в РСЯ...";
+            statusNode.style.color = "orange";
 
-            // Каждую итерацию создаем уникальный ID под-контейнера
-            const uniqueId = `yandex_rtb_${BLOCK_ID}_${Date.now()}`;
-            parentContainer.innerHTML = `<div id="${uniqueId}"></div>`;
-
-            if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
-                statusNode.innerText = "Запрос отправлен...";
-                statusNode.style.color = "orange";
-
-                window.yaContextCB.push(() => {
-                    Ya.Context.AdvManager.render({
-                        blockId: BLOCK_ID,
-                        renderTo: uniqueId,
-                        async: true,
-                        onRender: (data) => {
-                            statusNode.innerText = `Успешно обновлено! (Продукт: ${data.product})`;
-                            statusNode.style.color = "green";
-                        },
-                        onError: (data) => {
-                            statusNode.innerText = `Ошибка РСЯ: ${data.code}`;
-                            statusNode.style.color = "red";
-                        }
-                    });
+            window.yaContextCB.push(() => {
+                Ya.Context.AdvManager.render({
+                    blockId: BLOCK_ID,
+                    renderTo: RENDER_TO,
+                    async: true,
+                    onRender: (data) => {
+                        statusNode.innerText = `Успешно загружено! Продукт: ${data.product}`;
+                        statusNode.style.color = "green";
+                    },
+                    onError: (data) => {
+                        statusNode.innerText = `РСЯ вернула ошибку: ${data.code}`;
+                        statusNode.style.color = "red";
+                    }
                 });
-            } else {
-                statusNode.innerText = "Скрипт context.js еще загружается...";
-            }
+            });
         }
 
-        // Запуск
+        // Запускаем через 3 секунды после открытия страницы (даем время для сети)
         setTimeout(() => {
-            refreshYandexAd();
-            setInterval(refreshYandexAd, INTERVAL);
-        }, 1500);
+            if (window.Ya) {
+                loadAd();
+                // Зацикливаем обновление
+                setInterval(loadAd, INTERVAL);
+            } else {
+                statusNode.innerText = "Критическая ошибка: Сеть полностью заблокировала скрипт Яндекса!";
+                statusNode.style.color = "red";
+            }
+        }, 3000);
     </script>
 
 </body>
