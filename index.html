@@ -143,16 +143,29 @@
 
 <!-- Отдельный рекламный блок внизу страницы -->
 <div class="ad-footer-container">
-<!-- Yandex.RTB R-A-19461198-1 -->
+
+<!-- Контейнер для рекламы -->
 <div id="yandex_rtb_R-A-19461198-1"></div>
+
 <script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19461198-1",
-        "renderTo": "yandex_rtb_R-A-19461198-1"
-    })
-})
+    const INTERVAL = 5000; // 5 секунд
+
+    setInterval(() => {
+        // Проверяем, загрузился ли уже API Яндекса
+        if (window.yaContextCB && window.Ya) {
+            // Вызываем встроенную функцию обновления конкретного блока
+            window.yaContextCB.push(() => {
+                Ya.Context.AdvManager.render({
+                    blockId: 'R-A-19461198-1', // ID вашего блока
+                    renderTo: 'yandex_rtb_R-A-19461198-1',
+                    async: true
+                });
+            });
+            console.log('Реклама Яндекс обновлена');
+        }
+    }, INTERVAL);
 </script>
+
 </div>
 
 </body>
