@@ -2,58 +2,74 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Тест РСЯ</title>
+    <title>Автообновление РСЯ</title>
 </head>
 <body>
 
-    <h3>Статус: <span id="ad-status" style="color: blue;">Ожидание загрузки context.js...</span></h3>
+    <h3>Статус фрейма: <span id="ad-status" style="color: blue;">Инициализация...</span></h3>
     
-    <!-- Используем фиксированный контейнер, разрешенный Яндексом -->
-    <div id="yandex_rtb_R-A-19461198-1" style="width: 300px; height: 250px; background: #fdfdfd; border: 1px solid #000;"></div>
-
-    <!-- Загружаем библиотеку Яндекса -->
-    <script src="https://yandex.ru/ads/system/context.js" async></script>
+    <!-- Контейнер, где будет появляться и обновляться реклама -->
+    <div id="yandex-ad-container" style="width: 300px; height: 250px; background: #f0f0f0; border: 1px dashed #ccc;"></div>
 
     <script>
-        window.yaContextCB = window.yaContextCB || [];
+        const INTERVAL = 5000; // Интервал обновления (5 секунд)
+        // Использован тестовый ID Яндекса (замените на свой R-A-19461198-1 при переносе на рабочий сайт)
+        const BLOCK_ID = 'R-A-2668388-3'; 
         
-        const INTERVAL = 7000; // 7 секунд
-        const BLOCK_ID = 'R-A-19461198-1'; // Всегда рабочий тестовый блок
-        const RENDER_TO = 'yandex_rtb_R-A-19461198-1';
-        const statusNode = document.getElementById('ad-status');
-
-        function loadAd() {
-            statusNode.innerText = "Запрос отправлен в РСЯ...";
-            statusNode.style.color = "orange";
-
-            window.yaContextCB.push(() => {
-                Ya.Context.AdvManager.render({
-                    blockId: BLOCK_ID,
-                    renderTo: RENDER_TO,
-                    async: true,
-                    onRender: (data) => {
-                        statusNode.innerText = `Успешно загружено! Продукт: ${data.product}`;
-                        statusNode.style.color = "green";
-                    },
-                    onError: (data) => {
-                        statusNode.innerText = `РСЯ вернула ошибку: ${data.code}`;
-                        statusNode.style.color = "red";
-                    }
-                });
-            });
+        function refreshAdIframe() {
+            const container = document.getElementById('yandex-ad-container');
+            const statusNode = document.getElementById('ad-status');
+            
+            // 1. Создаем абсолютно чистый iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.scrolling = 'no';
+            
+            // 2. Очищаем контейнер от старого фрейма
+            container.innerHTML = '';
+            container.appendChild(iframe);
+            
+            // 3. Формируем полноценный HTML-код для внутренностей iframe
+            const iframeHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
+                </head>
+                <body>
+                    <div id="yandex_rtb_${BLOCK_ID}"></div>
+                    <script src="https://yandex.ru/ads/system/context.js" async><\/script>
+                    <script>
+                        window.yaContextCB = window.yaContextCB || [];
+                        window.yaContextCB.push(() => {
+                            Ya.Context.AdvManager.render({
+                                blockId: '${BLOCK_ID}',
+                                renderTo: 'yandex_rtb_${BLOCK_ID}',
+                                async: true
+                            });
+                        });
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            // 4. Записываем код внутрь фрейма (это заставляет его выполниться как новую страницу)
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(iframeHtml);
+            doc.close();
+            
+            statusNode.innerText = `Фрейм пересоздан в ${new Date().toLocaleTimeString()}`;
+            statusNode.style.color = "green";
         }
 
-        // Запускаем через 3 секунды после открытия страницы (даем время для сети)
-        setTimeout(() => {
-            if (window.Ya) {
-                loadAd();
-                // Зацикливаем обновление
-                setInterval(loadAd, INTERVAL);
-            } else {
-                statusNode.innerText = "Критическая ошибка: Сеть полностью заблокировала скрипт Яндекса!";
-                statusNode.style.color = "red";
-            }
-        }, 3000);
+        // Запускаем первый раз
+        refreshAdIframe();
+
+        // Зацикливаем обновление каждые 5 секунд
+        setInterval(refreshAdIframe, INTERVAL);
     </script>
 
 </body>
