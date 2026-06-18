@@ -1,72 +1,159 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<!-- Yandex.RTB -->
+<script>window.yaContextCb=window.yaContextCb||[]</script>
+<script src="https://yandex.ru/ads/system/context.js" async></script>
     <meta charset="UTF-8">
-    <title>Тест РСЯ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Телерадио Портал</title>
+    <style>
+        /* Современный градиентный фон */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Глубокий темно-синий градиент */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Элементы идут друг за другом вертикально */
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Контейнер для центрирования карточки на оставшемся экране */
+        .main-content {
+            flex: 1; /* Занимает всё свободное пространство, толкая рекламу вниз */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Контейнер с эффектом матового стекла (Glassmorphism) */
+        .portal-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 360px; /* Оптимально для мобильных */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Заголовок внутри карточки */
+        .portal-title {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Сетка для кнопок */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+        }
+
+        /* Стильные мобильные кнопки (теперь применяются к ссылкам напрямую) */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08); /* Полупрозрачные стильные кнопки */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            text-decoration: none; /* Убирает подчеркивание ссылки */
+        }
+
+        /* Эффект при нажатии на обычные кнопки */
+        .btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
+        }
+
+        /* Яркий акцент для кнопки скачивания */
+        .btn-download {
+            background: #0071e3; /* Фирменный синий цвет Apple/Google */
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+        }
+        
+        .btn-download:active {
+            background: #005bb5;
+        }
+
+        /* Выделенный блок для рекламы в самом низу страницы */
+        .ad-footer-container {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 40px; /* Отступ от контента сверху */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Адаптация для планшетов и ПК */
+        @media (min-width: 600px) {
+            .portal-card {
+                max-width: 500px;
+                padding: 40px;
+            }
+            .button-container {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .btn {
+                font-size: 15px;
+                padding: 12px 24px;
+                width: auto; /* На ПК кнопки встанут в ряд и будут по размеру текста */
+                flex: 1;    /* Или будут поровну делить ширину карточки */
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <h3>Статус рекламы: <span id="ad-status" style="color: blue;">Инициализация...</span></h3>
-    
-    <!-- Контейнер для рекламы -->
-    <div id="yandex-dynamic-container" style="min-height: 90px; background: #f0f0f0; border: 1px dashed #ccc;"></div>
-
-    <!-- Загрузчик Яндекса -->
-    <script src="https://yandex.ru/ads/system/context.js" async onerror="document.getElementById('ad-status').innerText='Ошибка: Скрипт Яндекса заблокирован (AdBlock?)'; document.getElementById('ad-status').style.color='red';"></script>
-
-    <script>
-    window.yaContextCB = window.yaContextCB || [];
-    
-    const INTERVAL = 10000; 
-    const BLOCK_ID = 'R-A-19461198-1';
-
-    function refreshYandexAd() {
-        const parentContainer = document.getElementById('yandex-dynamic-container');
-        const statusNode = document.getElementById('ad-status');
+<!-- Основной контент страницы -->
+<div class="main-content">
+    <div class="portal-card">
+        <h1 class="portal-title">Телерадио Портал</h1>
         
-        if (!parentContainer) return;
+        <div class="button-container">
+            <a href="/tv.html" class="btn">Телевидение</a>
+            <a href="/radio.html" class="btn">Радио</a>
+            <a href="/rustore.html" class="btn btn-download">Скачать</a>
+        </div>
+    </div>
+</div>
 
-        const uniqueId = `yandex_rtb_${BLOCK_ID}_${Date.now()}`;
-        parentContainer.innerHTML = `<div id="${uniqueId}"></div>`;
-
-        if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
-            statusNode.innerText = "Запрос отправлен в РСЯ...";
-            statusNode.style.color = "orange";
-
-            window.yaContextCB.push(() => {
-                Ya.Context.AdvManager.render({
-                    blockId: BLOCK_ID,
-                    renderTo: uniqueId,
-                    async: true,
-                    // Если реклама успешно показана:
-                    onRender: (data) => {
-                        statusNode.innerText = `Реклама загружена! (Тип: ${data.product})`;
-                        statusNode.style.color = "green";
-                    },
-                    // Если Яндекс вернул ошибку или пустой блок:
-                    onError: (data) => {
-                        statusNode.style.color = "red";
-                        if (data.code === 2) {
-                            statusNode.innerText = "РСЯ ответила: Нет подходящей рекламы для показа (ошибка 2)";
-                        } else {
-                            statusNode.innerText = `РСЯ вернула ошибку. Код: ${data.code}, Текст: ${data.text}`;
-                        }
-                    }
-                });
-            });
-        } else {
-            statusNode.innerText = "Ошибка: Скрипт Яндекса не найден в системе";
-            statusNode.style.color = "red";
-        }
-    }
-
-    // Запуск через 2 секунды
-    setTimeout(() => {
-        refreshYandexAd();
-        setInterval(refreshYandexAd, INTERVAL);
-    }, 2000);
+<!-- Отдельный рекламный блок внизу страницы -->
+<div class="ad-footer-container">
+<!-- Yandex.RTB R-A-19461198-1 -->
+<div id="yandex_rtb_R-A-19461198-1"></div>
+<script>
+window.yaContextCb.push(() => {
+    Ya.Context.AdvManager.render({
+        "blockId": "R-A-19461198-1",
+        "renderTo": "yandex_rtb_R-A-19461198-1"
+    })
+})
 </script>
-
+</div>
 
 </body>
 </html>

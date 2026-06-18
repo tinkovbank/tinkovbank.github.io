@@ -2,30 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <style>
-        /* Убираем все отступы, чтобы баннер встал ровно */
-        body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
-    </style>
+    <title>Тест РСЯ</title>
 </head>
 <body>
 
-    <!-- Вставляем контейнер Яндекса -->
-    <div id="yandex_rtb_R-A-19461198-1"></div>
-
-    <!-- Загружаем библиотеку РСЯ -->
-    <script src="https://yandex.ru/ads/system/context.js" async></script>
+    <h3>Статус рекламы: <span id="ad-status" style="color: blue;">Инициализация...</span></h3>
     
-    <!-- Инициализируем показ баннера -->
+    <!-- Контейнер для рекламы -->
+    <div id="yandex-dynamic-container" style="min-height: 90px; background: #f0f0f0; border: 1px dashed #ccc;"></div>
+
+    <!-- Загрузчик Яндекса -->
+    <script src="https://yandex.ru/ads/system/context.js" async onerror="document.getElementById('ad-status').innerText='Ошибка: Скрипт Яндекса заблокирован (AdBlock?)'; document.getElementById('ad-status').style.color='red';"></script>
+
     <script>
-        window.yaContextCB = window.yaContextCB || [];
-        window.yaContextCB.push(() => {
-            Ya.Context.AdvManager.render({
-                blockId: 'R-A-19461198-1',
-                renderTo: 'yandex_rtb_R-A-19461198-1',
-                async: true
+    window.yaContextCB = window.yaContextCB || [];
+    
+    const INTERVAL = 10000; 
+    const BLOCK_ID = 'R-A-19461198-1';
+
+    function refreshYandexAd() {
+        const parentContainer = document.getElementById('yandex-dynamic-container');
+        const statusNode = document.getElementById('ad-status');
+        
+        if (!parentContainer) return;
+
+        const uniqueId = `yandex_rtb_${BLOCK_ID}_${Date.now()}`;
+        parentContainer.innerHTML = `<div id="${uniqueId}"></div>`;
+
+        if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
+            statusNode.innerText = "Запрос отправлен в РСЯ...";
+            statusNode.style.color = "orange";
+
+            window.yaContextCB.push(() => {
+                Ya.Context.AdvManager.render({
+                    blockId: BLOCK_ID,
+                    renderTo: uniqueId,
+                    async: true,
+                    // Если реклама успешно показана:
+                    onRender: (data) => {
+                        statusNode.innerText = `Реклама загружена! (Тип: ${data.product})`;
+                        statusNode.style.color = "green";
+                    },
+                    // Если Яндекс вернул ошибку или пустой блок:
+                    onError: (data) => {
+                        statusNode.style.color = "red";
+                        if (data.code === 2) {
+                            statusNode.innerText = "РСЯ ответила: Нет подходящей рекламы для показа (ошибка 2)";
+                        } else {
+                            statusNode.innerText = `РСЯ вернула ошибку. Код: ${data.code}, Текст: ${data.text}`;
+                        }
+                    }
+                });
             });
-        });
-    </script>
+        } else {
+            statusNode.innerText = "Ошибка: Скрипт Яндекса не найден в системе";
+            statusNode.style.color = "red";
+        }
+    }
+
+    // Запуск через 2 секунды
+    setTimeout(() => {
+        refreshYandexAd();
+        setInterval(refreshYandexAd, INTERVAL);
+    }, 2000);
+</script>
+
 
 </body>
 </html>
