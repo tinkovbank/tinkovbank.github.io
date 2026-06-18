@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скачать наше приложение из RuStore</title>
+    <!-- Подключаем современный шрифт -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2463F6; /* Фирменный синий цвет RuStore */
+            --bg-color: #0F172A; /* Темный глубокий фон */
+            --card-bg: #1E293B; /* Цвет карточки */
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Логотип вашего приложения */
+        .app-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 16px rgba(36, 99, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .description {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 32px;
+        }
+
+        /* Стилизация кнопки RuStore */
+        .btn-rustore {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 12px rgba(36, 99, 246, 0.2);
+        }
+
+        .btn-rustore:hover {
+            background-color: #1d52d4;
+            box-shadow: 0 6px 20px rgba(36, 99, 246, 0.4);
+        }
+
+        .btn-rustore:active {
+            transform: scale(0.98);
+        }
+
+        /* Иконка внутри кнопки */
+        .btn-rustore svg {
+            margin-right: 12px;
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .footer-info {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Замените на путь к вашей иконке: <img src="logo.png" alt="Logo" class="app-logo"> -->
+        <div class="app-logo">🚀</div>
+        
+        <h1>Название Приложения</h1>
+        <p class="description">Установите наше официальное мобильное приложение прямо сейчас через надежный магазин приложений RuStore.</p>
+        
+        <!-- Вставьте вашу ссылку на приложение в атрибут href -->
+        <a href="https://rustore.ru" class="btn-rustore" target="_blank" rel="noopener">
+            <!-- Иконка, напоминающая фирменный знак RuStore/Android скачивания -->
+            <svg viewBox="0 0 24 24">
+                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+            </svg>
+            Доступно в RuStore
+        </a>
+        
+        <div class="footer-info">
+            Безопасно • Официальная версия • Бесплатно
+        </div>
+    </div>
+
+</body>
+</html>
