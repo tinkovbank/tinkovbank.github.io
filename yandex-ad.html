@@ -35,30 +35,30 @@
             container.appendChild(iframe);
             
             // 3. Генерируем чистый HTML-код РСЯ для внутренностей фрейма
-            const iframeHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-				    <script>window.yaContextCb=window.yaContextCb||[]</script>
-				    <script src="https://yandex.ru/ads/system/context.js" async></script>
-                    <meta charset="UTF-8">
-                    <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
-                </head>
-                <body>
-                    <div id="yandex_rtb_${BLOCK_ID}"></div>
-                    <script>
-                        window.yaContextCB = window.yaContextCB || [];
-                        window.yaContextCB.push(() => {
-                            Ya.Context.AdvManager.render({
-                                blockId: '${BLOCK_ID}',
-                                renderTo: 'yandex_rtb_${BLOCK_ID}',
-                                async: true
-                            });
-                        });
-                    </script>
-                </body>
-                </html>
-            `;
+const iframeHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
+        <script>window.yaContextCb = window.yaContextCb || [];</script>
+        <script src="https://yandex.ru/ads/system/context.js" async></script>
+    </head>
+    <body>
+        <div id="yandex_rtb_${BLOCK_ID}"></div>
+        <script>
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    blockId: '${BLOCK_ID}',
+                    renderTo: 'yandex_rtb_${BLOCK_ID}',
+                    async: true
+                });
+            });
+        </script>
+    </body>
+    </html>
+`;
+
             
             // 4. Записываем код во фрейм для исполнения
             const doc = iframe.contentWindow.document;
