@@ -142,45 +142,37 @@
 </div>
 
 <!-- Обертка, внутри которой мы будем пересоздавать рекламный блок -->
-<div id="ad-wrapper">
+<div id="ad-wrapper-2">
     <div id="yandex_rtb_R-A-19461198-1"></div>
 </div>
 
+<!-- Подключаем сам скрипт Яндекса (обязательно один раз на странице) -->
+<script src="https://yandex.ru" async></script>
+
 <script>
-    const INTERVAL = 5000; // 5 секунд
-    const BLOCK_ID = 'R-A-19461198-1';
-    const RENDER_TO = `yandex_rtb_${BLOCK_ID}`;
-
-    function refreshYandexAd() {
-        const wrapper = document.getElementById('ad-wrapper');
-        if (!wrapper) return;
-
-        // 1. Полностью очищаем обертку и создаем новый чистый div с нужным ID
-        wrapper.innerHTML = `<div id="${RENDER_TO}"></div>`;
-
-        // 2. Проверяем наличие API Яндекса в системе
-        if (window.yaContextCB && window.Ya) {
-            window.yaContextCB.push(() => {
-                Ya.Context.AdvManager.render({
-                    blockId: BLOCK_ID,
-                    renderTo: RENDER_TO,
-                    async: true
-                });
+    window.yaContextCB = window.yaContextCB || [];
+    
+    function loadAd() {
+        // Пересоздаем контейнер перед рендером
+        document.getElementById('ad-wrapper-2').innerHTML = '<div id="yandex_rtb_R-A-19461198-1"></div>';
+        
+        // Отправляем команду на рендер в очередь Яндекса
+        window.yaContextCB.push(() => {
+            Ya.Context.AdvManager.render({
+                blockId: 'R-A-19461198-1',
+                renderTo: 'yandex_rtb_R-A-19461198-1',
+                async: true
             });
-            console.log('Рекламный блок РСЯ успешно пересоздан');
-        } else {
-            console.log('API Яндекса еще не загрузилось');
-        }
+        });
     }
 
-    // Первый запуск при загрузке страницы
-    // Если на странице уже есть стандартный скрипт загрузки РСЯ context.js, 
-    // можно запустить функцию сразу или с небольшой задержкой
-    setTimeout(refreshYandexAd, 1000); 
+    // Первый вызов
+    window.yaContextCB.push(loadAd);
 
-    // Запускаем интервал обновления каждые 5 секунд
-    setInterval(refreshYandexAd, INTERVAL);
+    // Обновление каждые 5 секунд
+    setInterval(loadAd, 5000);
 </script>
+
 
 
 </body>
