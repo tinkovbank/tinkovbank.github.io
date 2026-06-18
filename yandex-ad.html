@@ -6,41 +6,45 @@
 </head>
 <body>
 
-    <h3>Статус фрейма: <span id="ad-status" style="color: blue;">Инициализация...</span></h3>
+    <h3>Статус рекламы: <span id="ad-status" style="color: green;">Цикл запущен</span></h3>
     
-    <!-- Контейнер, где будет появляться и обновляться реклама -->
-    <div id="yandex-ad-container" style="width: 300px; height: 250px; background: #f0f0f0; border: 1px dashed #ccc;"></div>
+    <!-- Контейнер для рекламы. Настройте width и height под формат вашего баннера -->
+    <div id="yandex-ad-container" style="width: 100%; max-width: 728px; height: 90px; background: transparent;"></div>
 
     <script>
-        const INTERVAL = 5000; // Интервал обновления (5 секунд)
-        // Использован тестовый ID Яндекса (замените на свой R-A-19461198-1 при переносе на рабочий сайт)
+        // ДЛЯ ТЕСТА: 5000 (5 секунд). 
+        // ДЛЯ РАБОЧЕГО САЙТА: поставьте 30000 (30 секунд), чтобы Яндекс не заблокировал аккаунт за накрутку!
+        const INTERVAL = 5000; 
+        
+        // ВСТАВЛЯЕМ ВАШ ЛИЧНЫЙ ID БЛОКА
         const BLOCK_ID = 'R-A-19461198-1'; 
         
         function refreshAdIframe() {
             const container = document.getElementById('yandex-ad-container');
             const statusNode = document.getElementById('ad-status');
             
-            // 1. Создаем абсолютно чистый iframe
+            // 1. Создаем изолированный фрейм
             const iframe = document.createElement('iframe');
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
             iframe.style.scrolling = 'no';
             
-            // 2. Очищаем контейнер от старого фрейма
+            // 2. Очищаем контейнер и вставляем фрейм
             container.innerHTML = '';
             container.appendChild(iframe);
             
-            // 3. Формируем полноценный HTML-код для внутренностей iframe
+            // 3. Генерируем чистый HTML-код РСЯ для внутренностей фрейма
             const iframeHtml = `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta charset="UTF-8">
                     <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
                 </head>
                 <body>
                     <div id="yandex_rtb_${BLOCK_ID}"></div>
-                    <script src="https://yandex.ru/ads/system/context.js" async><\/script>
+                    <script src="https://yandex.ru" async><\/script>
                     <script>
                         window.yaContextCB = window.yaContextCB || [];
                         window.yaContextCB.push(() => {
@@ -55,20 +59,19 @@
                 </html>
             `;
             
-            // 4. Записываем код внутрь фрейма (это заставляет его выполниться как новую страницу)
+            // 4. Записываем код во фрейм для исполнения
             const doc = iframe.contentWindow.document;
             doc.open();
             doc.write(iframeHtml);
             doc.close();
             
-            statusNode.innerText = `Фрейм пересоздан в ${new Date().toLocaleTimeString()}`;
-            statusNode.style.color = "green";
+            console.log(`[РСЯ] Баннер обновлен в ${new Date().toLocaleTimeString()}`);
         }
 
-        // Запускаем первый раз
+        // Первый запуск баннера при загрузке страницы
         refreshAdIframe();
 
-        // Зацикливаем обновление каждые 5 секунд
+        // Запуск бесконечного цикла автоматического обновления
         setInterval(refreshAdIframe, INTERVAL);
     </script>
 
