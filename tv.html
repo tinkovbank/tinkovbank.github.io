@@ -27,7 +27,7 @@
         }
         .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
             max-width: 1650px;
             margin: 0 auto;
@@ -113,6 +113,7 @@
 <div style="display: flex; gap: 30px; max-width: 100%; justify-content: center;">
   <a href="/tv.html"><button>Телевидение</button></a>
   <a href="/radio.html"><button>Радио</button></a>
+  <a href="/rustore.html"><button>Скачать Приложение</button></a>
 </div>
 
 
@@ -175,7 +176,6 @@
                 <div class="video-container">
                     <div class="video-placeholder" id="placeholder-${i}">
                         <div class="play-icon">▶</div>
-                        <div>Нажмите для включения</div>
                     </div>
                     <video id="${videoId}" controls playsinline></video>
                 </div>
