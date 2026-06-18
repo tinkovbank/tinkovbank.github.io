@@ -1,31 +1,179 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<!-- Yandex.RTB -->
+<script>window.yaContextCb=window.yaContextCb||[]</script>
+<script src="https://yandex.ru/ads/system/context.js" async></script>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Телерадио Портал</title>
     <style>
-        /* Убираем все отступы, чтобы баннер встал ровно */
-        body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+        /* Современный градиентный фон */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Глубокий темно-синий градиент */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column; /* Элементы идут друг за другом вертикально */
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Контейнер для центрирования карточки на оставшемся экране */
+        .main-content {
+            flex: 1; /* Занимает всё свободное пространство, толкая рекламу вниз */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Контейнер с эффектом матового стекла (Glassmorphism) */
+        .portal-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 360px; /* Оптимально для мобильных */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* Заголовок внутри карточки */
+        .portal-title {
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Сетка для кнопок */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+        }
+
+        /* Стильные мобильные кнопки (теперь применяются к ссылкам напрямую) */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08); /* Полупрозрачные стильные кнопки */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            text-decoration: none; /* Убирает подчеркивание ссылки */
+        }
+
+        /* Эффект при нажатии на обычные кнопки */
+        .btn:active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
+        }
+
+        /* Яркий акцент для кнопки скачивания */
+        .btn-download {
+            background: #0071e3; /* Фирменный синий цвет Apple/Google */
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+        }
+        
+        .btn-download:active {
+            background: #005bb5;
+        }
+
+        /* Выделенный блок для рекламы в самом низу страницы */
+        .ad-footer-container {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 40px; /* Отступ от контента сверху */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Адаптация для планшетов и ПК */
+        @media (min-width: 600px) {
+            .portal-card {
+                max-width: 500px;
+                padding: 40px;
+            }
+            .button-container {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .btn {
+                font-size: 15px;
+                padding: 12px 24px;
+                width: auto; /* На ПК кнопки встанут в ряд и будут по размеру текста */
+                flex: 1;    /* Или будут поровну делить ширину карточки */
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Вставляем контейнер Яндекса -->
-    <div id="yandex_rtb_R-A-19461198-1"></div>
+<!-- Основной контент страницы -->
+<div class="main-content">
+    <div class="portal-card">
+        <h1 class="portal-title">Телерадио Портал</h1>
+        
+        <div class="button-container">
+            <a href="/tv.html" class="btn">Телевидение</a>
+            <a href="/radio.html" class="btn">Радио</a>
+            <a href="/rustore.html" class="btn btn-download">Скачать</a>
+        </div>
+    </div>
+</div>
 
-    <!-- Загружаем библиотеку РСЯ -->
-    <script src="https://yandex.ru/ads/system/context.js" async></script>
-    
-    <!-- Инициализируем показ баннера -->
-    <script>
-        window.yaContextCB = window.yaContextCB || [];
-        window.yaContextCB.push(() => {
-            Ya.Context.AdvManager.render({
-                blockId: 'R-A-19461198-1',
-                renderTo: 'yandex_rtb_R-A-19461198-1',
-                async: true
-            });
-        });
-    </script>
+<!-- Контейнер, где будет появляться реклама. Задайте ширину и высоту вашего баннера -->
+<div id="my-ad-container" style="width: 100%; max-width: 728px; height: 90px;"></div>
+
+<script>
+    const AD_FILE = 'yandex-ad.html'; // Путь к созданному файлу
+    const INTERVAL = 5000;            // 5 секунд
+    const container = document.getElementById('my-ad-container');
+
+    function refreshBanner() {
+        // Создаем элемент iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.style.scrolling = 'no';
+        
+        // Добавляем timestamp, чтобы обмануть кэш браузера
+        iframe.src = `${AD_FILE}?t=${Date.now()}`;
+        
+        // Очищаем контейнер от старого фрейма и добавляем новый
+        container.innerHTML = '';
+        container.appendChild(iframe);
+        
+        console.log('Рекламный блок РСЯ принудительно обновлен через iframe');
+    }
+
+    // Первый запуск баннера
+    refreshBanner();
+
+    // Запуск цикла обновления
+    setInterval(refreshBanner, INTERVAL);
+</script>
+
 
 </body>
 </html>
