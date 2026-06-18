@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТВ Мониторинг — Включение по клику</title>
+    <!-- Используем стабильный CDN Cloudflare -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #0b0c10;
+            color: #fff;
+            padding: 15px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            color: #45f3ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-width: 1650px;
+            margin: 0 auto;
+        }
+        /* Карточка блока */
+        .channel-card {
+            background-color: #1f2833;
+            border: 2px solid #1f2833;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer; /* Меняем курсор, показывая, что можно кликнуть */
+        }
+        .channel-card:hover { 
+            transform: translateY(-2px); 
+            border-color: #45f3ff; 
+        }
+        /* Состояние активного (воспроизводящегося) канала */
+        .channel-card.playing {
+            border-color: #25d366;
+        }
+        .video-container { 
+            position: relative; 
+            width: 100%; 
+            padding-top: 56.25%; 
+            background-color: #000; 
+        }
+        video { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: none; /* Скрываем видео, пока оно не играет */
+        }
+        /* Заглушка, пока видео не запущено */
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #151a21 0%, #0b0c10 100%);
+            color: #66fcf1;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+        .channel-card:hover .video-placeholder {
+            background: #1a233a;
+        }
+        /* Иконка плей */
+        .play-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: #45f3ff;
+        }
+        .channel-info {
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: #151a21;
+            color: #c5a059;
+            border-top: 1px solid #2a3545;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Мультиэкран ТВ (Запуск по клику)</h1>
+    <div class="grid-container" id="grid"></div>
+
+    <script>
+        // Массив базовых HLS-трансляций
+        const baseStreams = [
+		    { name: "Первый канал", url: "https://s91030.cdn.ngenix.net/hls/CH_R03_OTT_DV_VLD_1TV_KRAY_MP4_T/variant.m3u8" },
+            { name: "5 Канал Петербург", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_5TV_7/variant.m3u8" },
+            { name: "Матч", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_MATCHTV/variant.m3u8" },
+            { name: "Россия 1", url: "https://s91030.cdn.ngenix.net/hls/CH_R04_OTT_DV_VLD_ROSSIA1_MP4_T/variant.m3u8" },
+            { name: "НТВ", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_NTV_7/variant.m3u8" },
+            { name: "Россия К", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_RUSSIAK_7/variant.m3u8" },
+            { name: "Россия 24", url: "https://s91030.cdn.ngenix.net/hls/CH_R01_OTT_DV_VLD_ROSSIA24_MP4_T/variant.m3u8" },
+            { name: "Карусель", url: "https://s91030.cdn.ngenix.net/hls/CH_R01_OTT_DV_VLD_KARUSEL_KRAY_MP4_T/variant.m3u8" },
+            { name: "ОТР", url: "https://s91030.cdn.ngenix.net/hls/CH_R01_OTT_DV_VLD_OTR_PRIMK/variant.m3u8" },
+			{ name: "ТВЦ", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_TVC_7/variant.m3u8" },
+			{ name: "Рен-ТВ", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_RENTV_7/variant.m3u8" },
+			{ name: "Спас", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_SPAS_7/variant.m3u8" },
+			{ name: "СТС", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_STS_7/variant.m3u8" },
+			{ name: "Домашний", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_DOMASHNY_7/variant.m3u8" },
+			{ name: "ТВ-3", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_TV3_7/variant.m3u8" },
+			{ name: "Пятница", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_FRIDAY_7/variant.m3u8" },
+			{ name: "Звезда", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_ZVEZDA_7/variant.m3u8" },
+			{ name: "МИР", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_MIR_7/variant.m3u8" },
+			{ name: "ТНТ", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_TNT_7/variant.m3u8" },
+			{ name: "Муз-ТВ", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_MUZTV_7/variant.m3u8" },
+			{ name: "ОТП Владивосток", url: "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_OTV/variant.m3u8" },
+			{ name: "Телемикс", url: "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_TMX/variant.m3u8" },
+			{ name: "8 Канал", url: "https://s91030.cdn.ngenix.net/hls/CH_R01_OTT_DV_VLD_OTT8KANAL/variant.m3u8" },
+			{ name: "Восток-24", url: "https://s91030.cdn.ngenix.net/hls/CH_R01_OTT_DV_VLD_VOSTOK24_OTT/variant.m3u8" },
+			{ name: "Че", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_PERETZ_7/variant.m3u8" },
+			{ name: "Ю", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_U_7/variant.m3u8" },
+			{ name: "РБК-ТВ", url: "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_RBKTVHD_VLDK/variant.m3u8" },
+			{ name: "Суббота", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_SUPER_7/variant.m3u8" },
+			{ name: "СТС Love", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_STSLOVE_4/variant.m3u8" },
+			{ name: "Солнце", url: "https://zabava-htlive.cdn.ngenix.net/hls/CH_DISNEY_7/variant.m3u8" },
+			{ name: "", url: "" }
+        ];
+
+        const grid = document.getElementById('grid');
+        const activePlayers = {}; // Здесь будем хранить активные экземпляры Hls.js
+
+        // Генерируем 35 карточек
+        for (let i = 0; i < 31; i++) {
+            const source = baseStreams[i % baseStreams.length];
+            const card = document.createElement('div');
+            card.className = 'channel-card';
+            
+            // Запоминаем URL и ID внутри атрибутов карточки
+            card.dataset.url = `${source.url}?session=${i}`;
+            card.dataset.index = i;
+
+            const videoId = `video-${i}`;
+
+            card.innerHTML = `
+                <div class="video-container">
+                    <div class="video-placeholder" id="placeholder-${i}">
+                        <div class="play-icon">▶</div>
+                        <div>Нажмите для включения</div>
+                    </div>
+                    <video id="${videoId}" controls playsinline></video>
+                </div>
+                <div class="channel-info">${source.name}</div>
+            `;
+            
+            // Навешиваем событие клика на карточку
+            card.addEventListener('click', function() {
+                togglePlayer(i, card.dataset.url);
+            });
+
+            grid.appendChild(card);
+        }
+
+        // Функция включения/выключения плеера по клику
+        function togglePlayer(index, url) {
+            const video = document.getElementById(`video-${index}`);
+            const placeholder = document.getElementById(`placeholder-${index}`);
+            const card = video.closest('.channel-card');
+
+            // Если канал уже воспроизводится — выключаем его для экономии ресурсов
+            if (activePlayers[index]) {
+                activePlayers[index].destroy();
+                delete activePlayers[index];
+                video.src = "";
+                video.style.display = "none";
+                placeholder.style.display = "flex";
+                card.classList.remove('playing');
+                return;
+            }
+
+            // Показываем элемент видео и скрываем заглушку
+            placeholder.style.display = "none";
+            video.style.display = "block";
+            card.classList.add('playing');
+
+            // Инициализируем Hls.js
+            if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                const hls = new Hls({
+                    maxBufferLength: 10,
+                    capLevelToPlayerSize: true
+                });
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(e => console.log("Не удалось запустить автоплей со звуком"));
+                });
+
+                // Сохраняем плеер в реестр, чтобы иметь возможность его закрыть
+                activePlayers[index] = hls;
+            } 
+            // Нативная поддержка для Safari (iOS/macOS)
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+                activePlayers[index] = true; // Просто флаг активности
+            }
+        }
+    </script>
+</body>
+</html>
