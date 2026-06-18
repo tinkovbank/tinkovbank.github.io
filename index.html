@@ -3,7 +3,7 @@
 <head>
 <!-- Yandex.RTB -->
 <script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
+<script src="https://yandex.ru" async></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Телерадио Портал</title>
@@ -15,10 +15,18 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Элементы идут друг за другом вертикально */
             min-height: 100vh;
             box-sizing: border-box;
+        }
+
+        /* Контейнер для центрирования карточки на оставшемся экране */
+        .main-content {
+            flex: 1; /* Занимает всё свободное пространство, толкая рекламу вниз */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
         /* Контейнер с эффектом матового стекла (Glassmorphism) */
@@ -33,6 +41,7 @@
             max-width: 360px; /* Оптимально для мобильных */
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             text-align: center;
+            box-sizing: border-box;
         }
 
         /* Заголовок внутри карточки */
@@ -53,13 +62,7 @@
             width: 100%;
         }
 
-        /* Ссылки-обертки */
-        .button-container a {
-            text-decoration: none;
-            width: 100%;
-        }
-
-        /* Стильные мобильные кнопки */
+        /* Стильные мобильные кнопки (теперь применяются к ссылкам напрямую) */
         .btn {
             display: block;
             width: 100%;
@@ -74,6 +77,7 @@
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
+            text-decoration: none; /* Убирает подчеркивание ссылки */
         }
 
         /* Эффект при нажатии на обычные кнопки */
@@ -93,6 +97,16 @@
             background: #005bb5;
         }
 
+        /* Выделенный блок для рекламы в самом низу страницы */
+        .ad-footer-container {
+            width: 100%;
+            max-width: 100%;
+            margin-top: 40px; /* Отступ от контента сверху */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         /* Адаптация для планшетов и ПК */
         @media (min-width: 600px) {
             .portal-card {
@@ -106,30 +120,40 @@
             .btn {
                 font-size: 15px;
                 padding: 12px 24px;
+                width: auto; /* На ПК кнопки встанут в ряд и будут по размеру текста */
+                flex: 1;    /* Или будут поровну делить ширину карточки */
             }
         }
     </style>
 </head>
 <body>
 
-<div class="portal-card">
-    <h1 class="portal-title">Телерадио Портал</h1>
-    
-    <div class="button-container">
-        <a href="/tv.html"><button class="btn">Телевидение</button></a>
-        <a href="/radio.html"><button class="btn">Радио</button></a>
-        <a href="/rustore.html"><button class="btn btn-download">Скачать</button></a>
+<!-- Основной контент страницы -->
+<div class="main-content">
+    <div class="portal-card">
+        <h1 class="portal-title">Телерадио Портал</h1>
+        
+        <div class="button-container">
+            <a href="/tv.html" class="btn">Телевидение</a>
+            <a href="/radio.html" class="btn">Радио</a>
+            <a href="/rustore.html" class="btn btn-download">Скачать</a>
+        </div>
     </div>
 </div>
-<!-- Yandex.RTB R-A-19461198-1 -->
-<div id="yandex_rtb_R-A-19461198-1"></div>
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19461198-1",
-        "renderTo": "yandex_rtb_R-A-19461198-1"
+
+<!-- Отдельный рекламный блок внизу страницы -->
+<div class="ad-footer-container">
+    <!-- Yandex.RTB R-A-19461198-1 -->
+    <div id="yandex_rtb_R-A-19461198-1"></div>
+    <script>
+    window.yaContextCb.push(() => {
+        Ya.Context.AdvManager.render({
+            "blockId": "R-A-19461198-1",
+            "renderTo": "yandex_rtb_R-A-19461198-1"
+        })
     })
-})
-</script>
+    </script>
+</div>
+
 </body>
 </html>
