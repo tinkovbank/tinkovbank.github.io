@@ -142,37 +142,50 @@
 </div>
 
 <!-- Контейнер, где будет появляться реклама. Задайте ширину и высоту вашего баннера -->
-<div id="my-ad-container" style="width: 100%; max-width: 728px; height: 90px;"></div>
+<!-- Главный контейнер для рекламы -->
+<div id="yandex-dynamic-container"></div>
+
+<!-- Обязательно подключаем сам загрузчик Яндекса (только 1 раз на странице) -->
+<script src="https://yandex.ru/ads/system/context.js" async></script>
 
 <script>
-    const AD_FILE = 'yandex-ad.html'; // Путь к созданному файлу
-    const INTERVAL = 5000;            // 5 секунд
-    const container = document.getElementById('my-ad-container');
+    window.yaContextCB = window.yaContextCB || [];
+    
+    const INTERVAL = 5000; // 5 секунд для теста (для сайта лучше ставить 30000)
+    const BLOCK_ID = 'R-A-19461198-1'; // ID вашего блока РСЯ
 
-    function refreshBanner() {
-        // Создаем элемент iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.border = 'none';
-        iframe.style.scrolling = 'no';
+    function refreshYandexAd() {
+        const parentContainer = document.getElementById('yandex-dynamic-container');
+        if (!parentContainer) return;
+
+        // Создаем абсолютно уникальный ID для тега div на основе текущего времени
+        const uniqueId = `yandex_rtb_${BLOCK_ID}_${Date.now()}`;
         
-        // Добавляем timestamp, чтобы обмануть кэш браузера
-        iframe.src = `${AD_FILE}?t=${Date.now()}`;
-        
-        // Очищаем контейнер от старого фрейма и добавляем новый
-        container.innerHTML = '';
-        container.appendChild(iframe);
-        
-        console.log('Рекламный блок РСЯ принудительно обновлен через iframe');
+        // Полностью заменяем внутренности родительского блока новым div с уникальным ID
+        parentContainer.innerHTML = `<div id="${uniqueId}"></div>`;
+
+        // Проверяем, доступны ли глобальные объекты Яндекса
+        if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
+            window.yaContextCB.push(() => {
+                Ya.Context.AdvManager.render({
+                    blockId: BLOCK_ID,
+                    renderTo: uniqueId, // Передаем уникальный ID контейнера
+                    async: true
+                });
+            });
+            console.log(`[РСЯ] Запрос отправлен в новый контейнер: ${uniqueId}`);
+        } else {
+            console.log('[РСЯ] Скрипт Яндекса еще загружается или заблокирован AdBlock-ом');
+        }
     }
 
-    // Первый запуск баннера
-    refreshBanner();
+    // Запускаем первый раз сразу после загрузки страницы
+    refreshYandexAd();
 
-    // Запуск цикла обновления
-    setInterval(refreshBanner, INTERVAL);
+    // Запускаем бесконечный цикл обновления каждые 5 секунд
+    setInterval(refreshYandexAd, INTERVAL);
 </script>
+
 
 
 </body>
