@@ -3,77 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>Автообновление РСЯ</title>
+    <!-- 1. Подключаем библиотеку Яндекса ОДИН РАЗ в главном окне -->
+    <script>window.yaContextCb = window.yaContextCb || [];</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
 </head>
 <body>
 
     <h3>Статус рекламы: <span id="ad-status" style="color: green;">Цикл запущен</span></h3>
     
-    <!-- Контейнер для рекламы. Настройте width и height под формат вашего баннера -->
-    <div id="yandex-ad-container" style="width: 100%; max-width: 728px; height: 90px; background: transparent;"></div>
+    <!-- 2. Чистый контейнер для рекламы прямо в body сайта (без iframe) -->
+    <div id="yandex_rtb_R-A-19461198-1" style="width: 100%; max-width: 728px; min-height: 90px; background: transparent;"></div>
 
     <script>
-        // ДЛЯ ТЕСТА: 5000 (5 секунд). 
-        // ДЛЯ РАБОЧЕГО САЙТА: поставьте 30000 (30 секунд), чтобы Яндекс не заблокировал аккаунт за накрутку!
-        const INTERVAL = 30000; 
-        
-        // ВСТАВЛЯЕМ ВАШ ЛИЧНЫЙ ID БЛОКА
+        const INTERVAL = 30000; // 30 секунд
         const BLOCK_ID = 'R-A-19461198-1'; 
         
-        function refreshAdIframe() {
-            const container = document.getElementById('yandex-ad-container');
-            const statusNode = document.getElementById('ad-status');
-            
-            // 1. Создаем изолированный фрейм
-            const iframe = document.createElement('iframe');
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.style.scrolling = 'no';
-            
-            // 2. Очищаем контейнер и вставляем фрейм
-            container.innerHTML = '';
-            container.appendChild(iframe);
-            
-            // 3. Генерируем чистый HTML-код РСЯ для внутренностей фрейма
-const iframeHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>body { margin: 0; padding: 0; overflow: hidden; background: transparent; }</style>
-        <script>window.yaContextCb = window.yaContextCb || [];</script>
-        <script src="https://yandex.ru/ads/system/context.js" async></script>
-    </head>
-    <body>
-        <div id="yandex_rtb_${BLOCK_ID}"></div>
-        <script>
+        function refreshAd() {
+            if (document.visibilityState !== 'visible') {
+                console.log(`[РСЯ] Обновление пропущено в ${new Date().toLocaleTimeString()}: вкладка скрыта`);
+                return;
+            }
+
             window.yaContextCb.push(() => {
-                Ya.Context.AdvManager.render({
-                    blockId: '${BLOCK_ID}',
-                    renderTo: 'yandex_rtb_${BLOCK_ID}',
+                // 3. Уничтожаем старый баннер перед вызовом нового (важно для очистки памяти!)
+                if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
+                    window.Ya.Context.AdvManager.destroy({
+                        blockId: BLOCK_ID,
+                        renderTo: `yandex_rtb_${BLOCK_ID}`
+                    });
+                }
+
+                // 4. Запрашиваем новый баннер в тот же контейнер
+                window.Ya.Context.AdvManager.render({
+                    blockId: BLOCK_ID,
+                    renderTo: `yandex_rtb_${BLOCK_ID}`,
                     async: true
                 });
             });
-        </script>
-    </body>
-    </html>
-`;
-
             
-            // 4. Записываем код во фрейм для исполнения
-            const doc = iframe.contentWindow.document;
-            doc.open();
-            doc.write(iframeHtml);
-            doc.close();
-            
-            console.log(`[РСЯ] Баннер обновлен в ${new Date().toLocaleTimeString()}`);
+            console.log(`[РСЯ] Запрос на обновление отправлен в ${new Date().toLocaleTimeString()}`);
         }
 
         // Первый запуск баннера при загрузке страницы
-        refreshAdIframe();
+        refreshAd();
 
-        // Запуск бесконечного цикла автоматического обновления
-        setInterval(refreshAdIframe, INTERVAL);
+        // Запуск безопасного цикла автоматического обновления
+        setInterval(refreshAd, INTERVAL);
     </script>
 
 </body>
