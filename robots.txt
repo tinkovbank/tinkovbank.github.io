@@ -1,2 +1,3 @@
 User-Agent: *
 Allow: /
+Sitemap: https://yiimp.hopto.org/sitemap.xml
