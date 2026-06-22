@@ -1,55 +1,29 @@
-<!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Автообновление РСЯ</title>
-    <!-- 1. Подключаем библиотеку Яндекса ОДИН РАЗ в главном окне -->
-    <script>window.yaContextCb = window.yaContextCb || [];</script>
-    <script src="https://yandex.ru/ads/system/context.js" async></script>
+<!--В <head> сайта один раз добавьте код загрузчика-->
+<script>window.yaContextCb = window.yaContextCb || []</script>
+<script src="https://yandex.ru/ads/system/context.js" async></script>
+
 </head>
 <body>
-
-    <h3>Статус рекламы: <span id="ad-status" style="color: green;">Цикл запущен</span></h3>
-    
-    <!-- 2. Чистый контейнер для рекламы прямо в body сайта (без iframe) -->
-    <div id="yandex_rtb_R-A-19461198-1" style="width: 100%; max-width: 728px; min-height: 90px; background: transparent;"></div>
-
-    <script>
-        const INTERVAL = 30000; // 30 секунд
-        const BLOCK_ID = 'R-A-19461198-1'; 
-        
-        function refreshAd() {
-            if (document.visibilityState !== 'visible') {
-                console.log(`[РСЯ] Обновление пропущено в ${new Date().toLocaleTimeString()}: вкладка скрыта`);
-                return;
+<!--AdFox START-->
+<!--yandex_zabava791236@gmail.com-->
+<!--Площадка: Новый сайт от 19.06.2026 / Новый раздел от 19.06.2026 / Новая площадка от 19.06.2026-->
+<!--Категория: <не задана>-->
+<!--Тип баннера: 100%x100% Turbo-->
+<div id="adfox_17821035982868955"></div>
+<script>
+    window.yaContextCb.push(()=>{
+        Ya.adfoxCode.create({
+            ownerId: 14679271,
+            containerId: 'adfox_17821035982868955',
+            params: {
+                p1: 'dpbpu',
+                p2: 'hukd'
             }
-
-            window.yaContextCb.push(() => {
-                // 3. Уничтожаем старый баннер перед вызовом нового (важно для очистки памяти!)
-                if (window.Ya && window.Ya.Context && window.Ya.Context.AdvManager) {
-                    window.Ya.Context.AdvManager.destroy({
-                        blockId: BLOCK_ID,
-                        renderTo: `yandex_rtb_${BLOCK_ID}`
-                    });
-                }
-
-                // 4. Запрашиваем новый баннер в тот же контейнер
-                window.Ya.Context.AdvManager.render({
-                    blockId: BLOCK_ID,
-                    renderTo: `yandex_rtb_${BLOCK_ID}`,
-                    async: true
-                });
-            });
-            
-            console.log(`[РСЯ] Запрос на обновление отправлен в ${new Date().toLocaleTimeString()}`);
-        }
-
-        // Первый запуск баннера при загрузке страницы
-        refreshAd();
-
-        // Запуск безопасного цикла автоматического обновления
-        setInterval(refreshAd, INTERVAL);
-    </script>
+        })
+    })
+</script>
 
 </body>
 </html>
