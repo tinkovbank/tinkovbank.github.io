@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <title>Плеер с рекламой Яндекс In-Image</title>
     
-    <!-- Подключаем jQuery (ваш скрипт) -->
     <script src="/js/jquery.min.js"></script>
-
-    <!-- ИСПОЛЬЗУЕМ АЛЬТЕРНАТИВНЫЙ CDN (cdnjs вместо jsdelivr) -->
     <script src="https://cloudflare.com"></script>
 
     <!-- Yandex.RTB -->
@@ -17,103 +14,87 @@
     <style>
         .video-container {
             position: relative;
-            max-width: 640px;
+            width: 640px;  /* Четко задаем ширину контейнера */
+            height: 360px; /* Четко задаем высоту контейнера */
             margin: 20px auto;
             background: #000;
         }
         video {
             width: 100%;
+            height: 100%;
             display: block;
         }
-        /* Картинка-превью, на которую Яндекс наложит рекламу In-Image */
+        /* Обязательно задаем размеры для картинки, чтобы Яндекс её "увидел" */
         .video-poster {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 640px;   /* Размеры должны совпадать с контейнером */
+            height: 360px;
             object-fit: cover;
             cursor: pointer;
-            z-index: 2;
+            z-index: 9999;  /* Картинка должна быть строго поверх всего */
         }
     </style>
 </head>
 <body>
 
 <div class="video-container">
-    <!-- КАРТИНКА-ПОСТЕР: Сюда привяжется реклама Яндекса. Замените src на вашу картинку -->
+    <!-- Убедитесь, что эта картинка реально существует и загружается (проверьте URL) -->
     <img id="player-poster" class="video-poster" src="https://media.sketchfab.com/models/46bd1da4f355422b813878fe15bc0334/0e3f65d356934646b55aa5b85d810731/textures/b0bd8b8493424b398d09e52c0f92821b/1c33f62e1f604923b7701844dd998f82.jpeg" alt="Превью видео">
-
-    <!-- HTML5 ПЛЕЕР -->
     <video id="video" controls></video>
 </div>
 
 <script>
-    // Сюда вставьте вашу реальную ссылку на видеопоток .m3u8:
     const videoSrc = "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_TMX/variant.m3u8"; 
 
-    $(document).ready(function() {
-        const video = $('#video')[0]; // Получаем нативный элемент для работы hls.js
+    // Функция вызова рекламы Яндекса для конкретного ID картинки
+    function runYandexAds(imageId) {
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "renderTo": imageId,
+                "blockId": "R-A-19461198-8",
+                "type": "inImage"
+            });
+        });
+    }
 
-        $('#player-poster').on('click', function() {
-            $(this).hide(); // Скрываем постер и баннер Яндекса
+    $(document).ready(function() {
+        const video = $('#video');
+        const poster = $('#player-poster');
+
+        // Генерируем уникальный ID для картинки, как того требует Яндекс
+        const uniqueId = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`;
+        poster.attr('id', uniqueId);
+
+        // Ждем полной загрузки самой картинки, и только потом вызываем Яндекс
+        if (poster([0]).complete) {
+            runYandexAds(uniqueId);
+        } else {
+            poster.on('load', function() {
+                runYandexAds(uniqueId);
+            });
+        }
+
+        // Логика клика и запуска видео
+        poster.on('click', function() {
+            $(this).hide(); // Скрываем постер вместе с рекламой
             
-            // Проверяем, загрузилась ли библиотека Hls из альтернативного CDN
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(videoSrc);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(e => console.log("Автовоспроизведение заблокировано браузером, нужен клик"));
+                    video[0].play();
                 });
-                
-                // Отслеживание ошибок потока .m3u8
-                hls.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) {
-                        console.error("Критическая ошибка HLS:", data.type);
-                    }
+            } else if (video[0].canPlayType('application/vnd.apple.mpegurl')) {
+                video.attr('src', videoSrc);
+                video[0].addEventListener('loadedmetadata', function() {
+                    video[0].play();
                 });
-
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                // Нативная поддержка для Safari (iOS/Mac)
-                video.src = videoSrc;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
-            } else {
-                alert("Ваш браузер не поддерживает воспроизведение видео .m3u8 или скрипты не загрузились.");
             }
         });
     });
-
-    // --- ВАШ КОД ЯНДЕКС.РТБ (БЕЗ ИЗМЕНЕНИЙ) ---
-    window.addEventListener("load", () => {
-        const render = (imageId) => {
-            window.yaContextCb.push(() => {
-                Ya.Context.AdvManager.render({
-                    "renderTo": imageId,
-                    "blockId": "R-A-19461198-8",
-                    "type": "inImage"
-                })
-            })
-        }
-        const renderInImage = (images) => {
-            if (!images.length) {
-                return
-            }
-            const image = images.shift()
-            image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
-            if (image.tagName === "IMG" && !image.complete) {
-                image.addEventListener("load", () => {
-                    render(image.id)
-                }, { once: true })
-            } else {
-                render(image.id)
-            }
-            renderInImage(images)
-        }
-        renderInImage(Array.from(document.querySelectorAll("img")))
-    }, { once: true })
 </script>
 
 </body>
