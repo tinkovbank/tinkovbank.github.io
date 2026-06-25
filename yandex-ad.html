@@ -1,28 +1,41 @@
 <html>
 <head>
-<!--В <head> сайта один раз добавьте код загрузчика-->
-<script>window.yaContextCb = window.yaContextCb || []</script>
+<!-- Yandex.RTB -->
+<script>window.yaContextCb=window.yaContextCb||[]</script>
 <script src="https://yandex.ru/ads/system/context.js" async></script>
 
 </head>
 <body>
-<!--AdFox START-->
-<!--yandex_zabava791236@gmail.com-->
-<!--Площадка: Новый сайт от 19.06.2026 / Новый раздел от 19.06.2026 / Новая площадка от 19.06.2026-->
-<!--Категория: <не задана>-->
-<!--Тип баннера: 100%x100% Turbo-->
-<div id="adfox_17821035982868955"></div>
+
+    <!-- Yandex.RTB R-A-19461198-8 -->
 <script>
-    window.yaContextCb.push(()=>{
-        Ya.adfoxCode.create({
-            ownerId: 14679271,
-            containerId: 'adfox_17821035982868955',
-            params: {
-                p1: 'dpbpu',
-                p2: 'hukd'
-            }
+window.addEventListener("load", () => {
+    const render = (imageId) => {
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "renderTo": imageId,
+                "blockId": "R-A-19461198-8",
+                "type": "inImage"
+            })
         })
-    })
+    }
+    const renderInImage = (images) => {
+        if (!images.length) {
+            return
+        }
+        const image = images.shift()
+        image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
+        if (image.tagName === "IMG" && !image.complete) {
+            image.addEventListener("load", () => {
+                render(image.id)
+            }, { once: true })
+        } else {
+            render(image.id)
+        }
+        renderInImage(images)
+    }
+    renderInImage(Array.from(document.querySelectorAll("img")))
+}, { once: true })
 </script>
 
 </body>
