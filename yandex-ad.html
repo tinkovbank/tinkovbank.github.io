@@ -1,41 +1,107 @@
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
+    <meta charset="UTF-8">
+    <title>Плеер с рекламой Яндекс In-Image</title>
+    
+    <!-- Подключаем библиотеку Hls.js для поддержки ссылок .m3u8 в браузере -->
+    <script src="https://jsdelivr.net"></script>
 
+    <!-- Yandex.RTB -->
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
+
+    <style>
+        /* Стили, чтобы плеер и реклама выглядели аккуратно */
+        .video-container {
+            position: relative;
+            max-width: 640px;
+            margin: 20px auto;
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+        /* Картинка-заставка, к которой привяжется реклама */
+        .video-poster {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            z-index: 2; /* Постер поверх плеера, пока не нажали Play */
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Yandex.RTB R-A-19461198-8 -->
+<div class="video-container">
+    <!-- 1. ПОСТЕР (КАРТИНКА): Сюда Яндекс привяжет рекламу. Замените URL на свою картинку -->
+    <img id="player-poster" class="video-poster" src="https://media.sketchfab.com/models/46bd1da4f355422b813878fe15bc0334/0e3f65d356934646b55aa5b85d810731/textures/b0bd8b8493424b398d09e52c0f92821b/1c33f62e1f604923b7701844dd998f82.jpeg" alt="Превью видео">
+
+    <!-- 2. ПЛЕЕР: Сюда загрузится ваше видео .m3u8 -->
+    <video id="video" controls></video>
+</div>
+
+
 <script>
-window.addEventListener("load", () => {
-    const render = (imageId) => {
-        window.yaContextCb.push(() => {
-            Ya.Context.AdvManager.render({
-                "renderTo": imageId,
-                "blockId": "R-A-19461198-8",
-                "type": "inImage"
+    // --- НАСТРОЙКА ВИДЕОПЛЕЕРА (.m3u8) ---
+    // ЗАМЕНИТЕ ЭТУ ССЫЛКУ НА ВАШУ .M3U8 ССЫЛКУ:
+    const videoSrc = "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_TMX/variant.m3u8"; 
+    
+    const video = document.getElementById('video');
+    const poster = document.getElementById('player-poster');
+
+    // Инициализация видео при клике на постер
+    poster.addEventListener('click', () => {
+        poster.style.display = 'none'; // Скрываем постер (и рекламу вместе с ним)
+        
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                video.play();
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Поддержка для Safari (iOS/Mac), где HLS работает нативно
+            video.src = videoSrc;
+            video.addEventListener('loadedmetadata', () => {
+                video.play();
+            });
+        }
+    });
+
+    // --- ВАШ КОД ЯНДЕКС.РТБ (БЕЗ ИЗМЕНЕНИЙ) ---
+    window.addEventListener("load", () => {
+        const render = (imageId) => {
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    "renderTo": imageId,
+                    "blockId": "R-A-19461198-8",
+                    "type": "inImage"
+                })
             })
-        })
-    }
-    const renderInImage = (images) => {
-        if (!images.length) {
-            return
         }
-        const image = images.shift()
-        image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
-        if (image.tagName === "IMG" && !image.complete) {
-            image.addEventListener("load", () => {
+        const renderInImage = (images) => {
+            if (!images.length) {
+                return
+            }
+            const image = images.shift()
+            image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
+            if (image.tagName === "IMG" && !image.complete) {
+                image.addEventListener("load", () => {
+                    render(image.id)
+                }, { once: true })
+            } else {
                 render(image.id)
-            }, { once: true })
-        } else {
-            render(image.id)
+            }
+            renderInImage(images)
         }
-        renderInImage(images)
-    }
-    renderInImage(Array.from(document.querySelectorAll("img")))
-}, { once: true })
+        renderInImage(Array.from(document.querySelectorAll("img")))
+    }, { once: true })
 </script>
 
 </body>
