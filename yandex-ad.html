@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <title>Плеер с рекламой Яндекс In-Image</title>
     
+    <!-- Подключаем jQuery (ваш локальный скрипт) -->
     <script src="/js/jquery.min.js"></script>
-    <script src="https://cloudflare.com"></script>
 
-    <!-- Yandex.RTB -->
+    <!-- Подключаем Hls.js с альтернативного рабочего CDN Cloudflare -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.6.13/hls.min.js"></script>
+
+    <!-- Yandex.RTB Глобальный загрузчик -->
     <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru" async></script>
 
     <style>
         .video-container {
             position: relative;
-            width: 640px;  /* Четко задаем ширину контейнера */
-            height: 360px; /* Четко задаем высоту контейнера */
+            width: 640px;  
+            height: 360px; 
             margin: 20px auto;
             background: #000;
         }
@@ -24,74 +27,90 @@
             height: 100%;
             display: block;
         }
-        /* Обязательно задаем размеры для картинки, чтобы Яндекс её "увидел" */
+        /* Картинка-постер, поверх которой Яндекс развернет рекламу */
         .video-poster {
             position: absolute;
             top: 0;
             left: 0;
-            width: 640px;   /* Размеры должны совпадать с контейнером */
-            height: 360px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             cursor: pointer;
-            z-index: 9999;  /* Картинка должна быть строго поверх всего */
+            z-index: 999; /* Постер находится строго над видео до клика */
         }
     </style>
 </head>
 <body>
 
 <div class="video-container">
-    <!-- Убедитесь, что эта картинка реально существует и загружается (проверьте URL) -->
+    <!-- КАРТИНКА-ПОСТЕР. Используется реальное тестовое изображение, чтобы Яндекс его точно увидел -->
     <img id="player-poster" class="video-poster" src="https://media.sketchfab.com/models/46bd1da4f355422b813878fe15bc0334/0e3f65d356934646b55aa5b85d810731/textures/b0bd8b8493424b398d09e52c0f92821b/1c33f62e1f604923b7701844dd998f82.jpeg" alt="Превью видео">
+    
+    <!-- HTML5 ВИДЕОПЛЕЕР -->
     <video id="video" controls></video>
 </div>
 
 <script>
+    // 1. УКАЖИТЕ ССЫЛКУ НА ВАШ ПОТОК .m3u8 ЗДЕСЬ:
     const videoSrc = "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_TMX/variant.m3u8"; 
 
-    // Функция вызова рекламы Яндекса для конкретного ID картинки
-    function runYandexAds(imageId) {
-        window.yaContextCb.push(() => {
-            Ya.Context.AdvManager.render({
-                "renderTo": imageId,
-                "blockId": "R-A-19461198-8",
-                "type": "inImage"
-            });
-        });
-    }
-
-    $(document).ready(function() {
-        const video = $('#video');
-        const poster = $('#player-poster');
-
-        // Генерируем уникальный ID для картинки, как того требует Яндекс
-        const uniqueId = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`;
-        poster.attr('id', uniqueId);
-
-        // Ждем полной загрузки самой картинки, и только потом вызываем Яндекс
-        if (poster([0]).complete) {
-            runYandexAds(uniqueId);
-        } else {
-            poster.on('load', function() {
-                runYandexAds(uniqueId);
-            });
+    // 2. ОФИЦИАЛЬНЫЙ СКРИПТ ОТОБРАЖЕНИЯ РЕКЛАМЫ ЯНДЕКС (In-Image)
+    // Код оставлен в оригинальной циклической структуре Яндекса для безошибочного рендеринга
+    window.addEventListener("load", () => {
+        const render = (imageId) => {
+            window.yaContextCb.push(() => {
+                Ya.Context.AdvManager.render({
+                    "renderTo": imageId,
+                    "blockId": "R-A-19461198-8",
+                    "type": "inImage"
+                })
+            })
         }
+        const renderInImage = (images) => {
+            if (!images.length) {
+                return
+            }
+            const image = images.shift()
+            image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
+            if (image.tagName === "IMG" && !image.complete) {
+                image.addEventListener("load", () => {
+                    render(image.id)
+                }, { once: true })
+            } else {
+                render(image.id)
+            }
+            renderInImage(images)
+        }
+        renderInImage(Array.from(document.querySelectorAll("img")))
+    }, { once: true });
 
-        // Логика клика и запуска видео
-        poster.on('click', function() {
-            $(this).hide(); // Скрываем постер вместе с рекламой
+
+    // 3. ЛОГИКА ЗАПУСКА ВИДЕО ПРИ КЛИКЕ НА ПОСТЕР
+    // Написано на чистом JS (Vanilla) для исключения конфликтов библиотек
+    document.addEventListener("DOMContentLoaded", () => {
+        const video = document.getElementById('video');
+        const poster = document.getElementById('player-poster');
+
+        poster.addEventListener('click', () => {
+            // Прячем картинку вместе со слоем рекламы Яндекса
+            poster.style.display = 'none'; 
             
+            // Запускаем HLS поток
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(videoSrc);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video[0].play();
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play().catch(err => console.log("Ошибка автозапуска видео:", err));
                 });
-            } else if (video[0].canPlayType('application/vnd.apple.mpegurl')) {
-                video.attr('src', videoSrc);
-                video[0].addEventListener('loadedmetadata', function() {
-                    video[0].play();
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // Нативная поддержка m3u8 (для iOS Safari / macOS)
+                video.src = videoSrc;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play();
                 });
+            } else {
+                console.error("Браузер не поддерживает воспроизведение формата HLS (.m3u8)");
             }
         });
     });
