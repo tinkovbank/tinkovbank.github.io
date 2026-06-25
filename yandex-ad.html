@@ -2,80 +2,115 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Простой плеер и реклама</title>
+    <title>Плеер и реклама Яндекс In-Image</title>
 
-    <!-- 1. ПОДКЛЮЧАЕМ JQUERY (ВАШ СКРИПТ) -->
+    <!-- Подключаем jQuery (ваш скрипт) -->
     <script src="/js/jquery.min.js"></script>
 
-    <!-- 2. ПОДКЛЮЧАЕМ ПЛЕЕР ДЛЯ ПОДДЕРЖКИ M3U8 (ИСПРАВЛЕНО: возвращен на место) -->
+    <!-- Подключаем плеер Hls.js для воспроизведения .m3u8 -->
     <script src="https://cloudflare.com"></script>
 
-    <!-- 3. ГЛАВНЫЙ СКРИПТ ЯНДЕКСА -->
+    <!-- Главный скрипт Яндекса -->
     <script>window.yaContextCb=window.yaContextCb||[]</script>
     <script src="https://yandex.ru/ads/system/context.js" async></script>
 
     <style>
-        .page-container {
-            max-width: 640px;
+        .video-container {
+            position: relative;
+            width: 640px;  
+            height: 360px; 
             margin: 20px auto;
-            font-family: sans-serif;
+            background: #000;
         }
         video {
             width: 100%;
-            height: 360px;
-            background: #000;
+            height: 100%;
             display: block;
         }
-        .ads-label {
-            font-size: 11px;
-            color: #777;
-            margin: 10px 0 5px 0;
-            text-align: right;
-        }
-        /* Место под стандартный баннер под плеером */
-        .yandex-banner {
+        /* Стили для картинки-постера. Она должна перекрывать плеер до клика */
+        .video-poster {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            min-height: 250px;
-            background: #f9f9f9;
-            border: 1px dashed #ccc;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            z-index: 999; 
         }
     </style>
 </head>
 <body>
 
-<div class="page-container">
-
-    <!-- ВИДЕОПЛЕЕР (С ВАШЕЙ ССЫЛКОЙ НА ПОСТЕР) -->
-    <video id="my-video" controls poster="https://yiimp.hopto.org/"></video>
-
-    <div class="ads-label">Реклама</div>
+<div class="video-container">
+    <!-- НАСТОЯЩАЯ КАРТИНКА: На неё Яндекс наложит вашу рекламу In-Image. 
+         Замените src на любую вашу картинку-превью, если нужно -->
+    <img id="player-poster" class="video-poster" src="https://media.sketchfab.com/models/46bd1da4f355422b813878fe15bc0334/0e3f65d356934646b55aa5b85d810731/textures/b0bd8b8493424b398d09e52c0f92821b/1c33f62e1f604923b7701844dd998f82.jpeg" alt="Превью видео">
     
-    <!-- МЕСТО ДЛЯ ОТОБРАЖЕНИЯ БАННЕРА ЯНДЕКСА -->
-    <div id="yandex_rtb_R-A-19461198-8" class="yandex-banner"></div>
-
+    <!-- HTML5 ВИДЕОПЛЕЕР (он спрятан под картинкой до клика) -->
+    <video id="my-video" controls></video>
 </div>
 
 <script>
-    // --- НАСТРОЙКА ВАШЕГО ВИДЕОПОТОКА .m3u8 ---
+    // --- 1. НАСТРОЙКА ВИДЕОПОТОКА .m3u8 ---
     const videoSrc = "https://s91030.cdn.ngenix.net/hls/CH_R25_OTT_DV_VLD_TMX/variant.m3u8"; 
-    const video = document.getElementById('my-video');
 
-    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoSrc; // Нативная поддержка для Apple Safari (iOS/Mac)
-    }
+    $(document).ready(function() {
+        const video = document.getElementById('my-video');
+        const poster = $('#player-poster');
 
-    // --- ПРОСТОЙ И ОШИБОЧНОБЕЗОПАСНЫЙ ВЫЗОВ РЕКЛАМЫ ЯНДЕКСА ---
-    // Код изменен с "inImage" на "feed/стандартный", так как на странице больше нет тегов <img>
-    window.yaContextCb.push(() => {
-        Ya.Context.AdvManager.render({
-            "renderTo": "yandex_rtb_R-A-19461198-8",
-            "blockId": "R-A-19461198-8"
-        })
+        // Обработка клика по картинке через jQuery
+        poster.on('click', function() {
+            poster.hide(); // Скрываем картинку (и реклама Яндекса на ней тоже закроется)
+            
+            // Включаем и запускаем видеопоток
+            if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
+        });
     });
+</script>
+
+<!-- --- 2. ВАШ ОРИГИНАЛЬНЫЙ КОД ЯНДЕКС.РТБ (ВСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ) --- -->
+<!-- Yandex.RTB R-A-19461198-8 -->
+<script>
+window.addEventListener("load", () => {
+    const render = (imageId) => {
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "renderTo": imageId,
+                "blockId": "R-A-19461198-8",
+                "type": "inImage"
+            })
+        })
+    }
+    const renderInImage = (images) => {
+        if (!images.length) {
+            return
+        }
+        const image = images.shift()
+        image.id = `yandex_rtb_R-A-19461198-8-${Math.random().toString(16).slice(2)}`
+        if (image.tagName === "IMG" && !image.complete) {
+            image.addEventListener("load", () => {
+                render(image.id)
+            }, { once: true })
+        } else {
+            render(image.id)
+        }
+        renderInImage(images)
+    }
+    renderInImage(Array.from(document.querySelectorAll("img")))
+}, { once: true })
 </script>
 
 </body>
