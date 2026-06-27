@@ -1,51 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<!--Generated with https://sitemap-xml.ru-->
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd">
   <url>
-    <loc>https://yiimp.hopto.org</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://yiimp.hopto.org/</loc>
+    <lastmod>2026-06-25T16:49:01+03:00</lastmod>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/tv.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:01+03:00</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/radio.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:01+03:00</lastmod>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/reklama</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-06-25T16:49:02+03:00</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/reklama/tbank/tb.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:01+03:00</lastmod>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/reklama/ozon/ozon.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:02+03:00</lastmod>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/reklama/alfa/alfa.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:01+03:00</lastmod>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://yiimp.hopto.org/reklama/gaz/gaz.html</loc>
-    <lastmod>2026-06-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-06-25T16:49:02+03:00</lastmod>
+    <priority>0.7</priority>
   </url>
 </urlset>
