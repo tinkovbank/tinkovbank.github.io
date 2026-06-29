@@ -16,14 +16,23 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column; /* Элементы идут друг за другом вертикально */
+            flex-direction: column; /* На мобильных всё идет сверху вниз */
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        /* Контейнер для центрирования карточки на оставшемся экране */
+        /* Общий контейнер, который на ПК выстроит карточку и рекламу в одну строку */
+        .page-wrapper {
+            display: flex;
+            flex-direction: column; /* Мобильный вид: вертикально */
+            flex: 1;
+            width: 100%;
+            gap: 20px;
+        }
+
+        /* Контейнер для центрирования карточки */
         .main-content {
-            flex: 1; /* Занимает всё свободное пространство, толкая рекламу вниз */
+            flex: 1; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -63,7 +72,7 @@
             width: 100%;
         }
 
-        /* Стильные мобильные кнопки (теперь применяются к ссылкам напрямую) */
+        /* Стильные мобильные кнопки */
         .btn {
             display: block;
             width: 100%;
@@ -78,7 +87,7 @@
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
-            text-decoration: none; /* Убирает подчеркивание ссылки */
+            text-decoration: none; /* Unlines links */
         }
 
         /* Эффект при нажатии на обычные кнопки */
@@ -87,69 +96,87 @@
             transform: scale(0.98);
         }
 
-        /* Яркий акцент для кнопки скачивания */
-        .btn-download {
-            background: #0071e3; /* Фирменный синий цвет Apple/Google */
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
-        }
-        
-        .btn-download:active {
-            background: #005bb5;
-        }
-
-        /* Выделенный блок для рекламы в самом низу страницы */
-        .ad-footer-container {
-            width: 100%;
-            max-width: 100%;
-            margin-top: 40px; /* Отступ от контента сверху */
+        /* Контейнер для рекламы */
+        .ad-container {
             display: flex;
             justify-content: center;
             align-items: center;
+            width: 100%;
+            margin-top: auto; /* Прижимает к низу на мобильных */
         }
 
-        /* Адаптация для планшетов и ПК */
-        @media (min-width: 600px) {
+        /* Адаптация для планшетов и ПК (экраны шире 900px) */
+        @media (min-width: 900px) {
+            .page-wrapper {
+                flex-direction: row; /* Размещает контент слева, а рекламу СПРАВА */
+                align-items: center;
+                justify-content: space-between;
+                max-width: 1200px; /* Ограничение ширины макета */
+                margin: 0 auto;    /* Центрирует всю страницу на экране */
+            }
+
+            .main-content {
+                justify-content: flex-end; /* Сдвигает карточку ближе к центру/правее */
+                padding-right: 50px;       /* Зазор перед рекламой */
+            }
+
+            .ad-container {
+                width: auto;               /* Реклама занимает только свою ширину */
+                margin-top: 0;             /* Отменяем мобильный отступ */
+                flex-shrink: 0;            /* Запрещаем рекламе сжиматься */
+            }
+
             .portal-card {
-                max-width: 500px;
+                max-width: 450px;
                 padding: 40px;
             }
+
             .button-container {
                 flex-direction: row;
                 justify-content: center;
             }
+
             .btn {
                 font-size: 15px;
                 padding: 12px 24px;
-                width: auto; /* На ПК кнопки встанут в ряд и будут по размеру текста */
-                flex: 1;    /* Или будут поровну делить ширину карточки */
+                width: auto; 
+                flex: 1;    
             }
         }
     </style>
 </head>
 <body>
 
-<!-- Основной контент страницы -->
-<div class="main-content">
-    <div class="portal-card">
-        <h1 class="portal-title">Телерадио Портал</h1>
-        
-        <div class="button-container">
-            <a href="/tv.html" class="btn">Телевидение</a>
-            <a href="/radio.html" class="btn">Радио</a>
+<!-- Все элементы обернуты в один wrapper -->
+<div class="page-wrapper">
+
+    <!-- Основной контент страницы -->
+    <div class="main-content">
+        <div class="portal-card">
+            <h1 class="portal-title">Телерадио Портал</h1>
+            
+            <div class="button-container">
+                <a href="/tv.html" class="btn">Телевидение</a>
+                <a href="/radio.html" class="btn">Радио</a>
+            </div>
         </div>
     </div>
+
+    <!-- Рекламный блок перемещен внутрь wrapper и обернут в ad-container -->
+    <div class="ad-container">
+        <!-- Yandex.RTB R-A-19461198-9 -->
+        <div id="yandex_rtb_R-A-19461198-9"></div>
+        <script>
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "blockId": "R-A-19461198-9",
+                "renderTo": "yandex_rtb_R-A-19461198-9"
+            })
+        })
+        </script>
+    </div>
+
 </div>
 
-<!-- Yandex.RTB R-A-19461198-9 -->
-<div id="yandex_rtb_R-A-19461198-9"></div>
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19461198-9",
-        "renderTo": "yandex_rtb_R-A-19461198-9"
-    })
-})
-</script>
 </body>
 </html>
