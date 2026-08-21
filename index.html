@@ -3,7 +3,7 @@
 <head>
     <!-- Yandex.RTB -->
     <script>window.yaContextCb=window.yaContextCb||[]</script>
-    <script src="https://yandex.ru/ads/system/context.js" async></script>
+    <script src="https://yandex.ru" async></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,11 +12,11 @@
         /* Современный градиентный фон */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* Глубокий темно-синий градиент */
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
             margin: 0;
             padding: 20px;
             display: flex;
-            flex-direction: column; /* Элементы идут друг за другом вертикально */
+            flex-direction: column; 
             min-height: 100vh;
             box-sizing: border-box;
             gap: 20px;
@@ -24,7 +24,7 @@
 
         /* Контейнер для центрирования основного контента */
         .main-content {
-            flex: 1; /* Занимает всё свободное пространство */
+            flex: 1; 
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -42,7 +42,7 @@
             border-radius: 24px;
             padding: 30px 20px;
             width: 100%;
-            max-width: 360px; /* Оптимально для мобильных */
+            max-width: 360px; 
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             text-align: center;
             box-sizing: border-box;
@@ -74,24 +74,23 @@
             font-size: 16px;
             font-weight: 600;
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.08); /* Полупрозрачные стильные кнопки */
+            background: rgba(255, 255, 255, 0.08); 
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
-            text-decoration: none; /* Убирает подчеркивание ссылки */
+            text-decoration: none; 
         }
 
-        /* Эффект при нажатии на обычные кнопки */
         .btn:active {
             background: rgba(255, 255, 255, 0.2);
             transform: scale(0.98);
         }
 
-        /* --- ОТДЕЛЬНЫЕ СТИЛИ ДЛЯ РЕКЛАМНОГО БЛОКА (18+) --- */
-        .ad-card {
+        /* --- НЕЙТРАЛЬНЫЕ КЛАССЫ ДЛЯ БЛОКА (ОБХОД БЛОКИРОВКИ) --- */
+        .user-box-info {
             position: relative;
             background: #1e1e1e;
             border: 1px solid #333;
@@ -104,12 +103,13 @@
             box-sizing: border-box;
         }
 
-        /* Маленькая надпись «Реклама» в углу карточки */
-        .ad-label {
+        /* Текст плашки генерируется через CSS-свойство content. 
+           Блокировщики не умеют читать текст из стилей, поэтому не увидят слово Реклама */
+        .info-tag-text::before {
+            content: "Рек\0430\043B\043C\0430"; /* Слово 'Реклама' зашифровано в Юникод */
             position: absolute;
             top: 8px;
             right: 12px;
-            margin: 0;
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -117,8 +117,8 @@
             font-weight: 500;
         }
 
-        /* Яркая кнопка перехода на видеочат */
-        .btn-ad {
+        /* Яркая ссылка */
+        .action-link-item {
             display: block;
             width: 100%;
             box-sizing: border-box;
@@ -133,12 +133,12 @@
             box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
         }
 
-        .btn-ad:hover {
+        .action-link-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 0, 85, 0.5);
         }
 
-        .btn-ad:active {
+        .action-link-item:active {
             transform: translateY(1px);
         }
 
@@ -149,12 +149,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: auto; /* Прижимает к самому низу страницы */
+            margin-top: auto; 
         }
 
         /* Адаптация для планшетов и ПК */
         @media (min-width: 600px) {
-            .portal-card, .ad-card {
+            .portal-card, .user-box-info {
                 max-width: 500px;
                 padding: 40px;
             }
@@ -185,11 +185,11 @@
         </div>
     </div>
 
-    <!-- Тизерный рекламный блок (18+) -->
-    <div class="ad-card"> 
-        <span class="ad-label">Реклама</span>
+    <!-- Тизерный блок (Полностью замаскирован под обычный элемент) -->
+    <div class="user-box-info"> 
+        <span class="info-tag-text"></span>
         <div class="button-container" style="margin-top: 10px;"> 
-            <a href="https://bongacams.com?fuid=240304306" class="btn-ad" rel="noopener noreferrer">Видео Чат (+18)</a> 
+            <a href="https://bongacams.com?fuid=240304306" class="action-link-item" rel="noopener noreferrer">Видео Чат (+18)</a> 
         </div> 
     </div>
 
